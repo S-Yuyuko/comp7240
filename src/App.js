@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import MovieGenres from './MovieGenres';
+import MovieGenres from './component/MovieGenres';
 
 function App() {
   const [showModal, setShowModal] = useState(true);
