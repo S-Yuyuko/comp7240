@@ -1,0 +1,39 @@
+/* MovieGenres.css */
+.selected-genres-container {
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .selected-genres-container h2 {
+    color: #61dafb;
+    margin-bottom: 20px;
+  }
+  
+  .selected-genres-container .selected-genre-label {
+    background-color: #61dafb;
+    color: #20232a;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  
+  .selected-genres-container .selected-genre-label:hover {
+    transform: scale(1.05);
+  }
+  
+  .selected-genres-container .remove-icon {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  
+  .selected-genres-container .remove-icon:hover {
+    color: #000000; /* Change color on hover for visual feedback */
+  }
+  

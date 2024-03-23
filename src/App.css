@@ -1,0 +1,62 @@
+/* App.css */
+body, h1, h2, p, ul, li {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #282c34; /* Deep blue background */
+  color: white;
+  line-height: 1.5;
+}
+
+.App {
+  text-align: center;
+  padding-top: 50px; /* Adjust padding to account for the menu height */
+}
+
+.menu {
+  width: 100%;
+  background-color: #20232a; /* Dark background for the menu */
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  z-index: 1000; /* High z-index to ensure menu is always on top */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu button {
+  background-color: #61dafb; /* Bright blue for contrast and visibility */
+  color: #20232a;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.menu button:hover {
+  background-color: #4095c6; /* Darker blue on hover for interaction feedback */
+}
+
+.App-content {
+  padding: 2rem; /* Spacious padding for aesthetic breathing room */
+  margin-top: 60px; /* Ensures content starts below the fixed menu */
+}
+
+.App-content h1 {
+  margin-bottom: 0.5rem; /* Spacing between the title and subtitle */
+  font-size: 2.5rem; /* Larger font size for title prominence */
+}
+
+.App-content p {
+  margin-bottom: 2rem; /* Spacing after the subtitle before content starts */
+  font-size: 1.2rem; /* Subtle increase in font size for readability */
+  color: #adbac7; /* Lighter grey for a softer contrast */
+}
+
+/* Add any additional styling below for MovieGenres or other components */
