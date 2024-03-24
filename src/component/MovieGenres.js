@@ -9,14 +9,14 @@ const MovieGenres = ({ showModal, setShowModal }) => {
     setShowModal(false); // Hide modal on submit
   };
 
+  const handleRemoveGenre = (genreToRemove) => {
+    setSelectedGenres(prevGenres => prevGenres.filter(genre => genre !== genreToRemove));
+  };
+
   const handleToggleGenre = (genre) => {
     setSelectedGenres(prev =>
       prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
     );
-  };
-
-  const handleRemoveGenre = (genreToRemove) => {
-    setSelectedGenres(prevGenres => prevGenres.filter(genre => genre !== genreToRemove));
   };
 
   // Placeholder genres list
@@ -32,9 +32,9 @@ const MovieGenres = ({ showModal, setShowModal }) => {
           onSubmit={handleSubmit}
         />
       )}
-      {!showModal && (
-        <div>
-          <h2>Selected Genres:</h2>
+      <div className="genre-display-container">
+        <h2>Selected Genres:</h2>
+        {!showModal && (
           <div className="selected-genres-container">
             {selectedGenres.map(genre => (
               <label 
@@ -47,8 +47,8 @@ const MovieGenres = ({ showModal, setShowModal }) => {
               </label>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

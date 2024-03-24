@@ -1,39 +1,49 @@
 /* MovieGenres.css */
+.genre-display-container {
+  text-align: center; /* This will keep the h2 centered */
+  margin: 20px auto;
+  padding: 20px;
+}
+
 .selected-genres-container {
-    margin: 20px;
-    padding: 20px;
-    text-align: center;
-    background-color: #333;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .selected-genres-container h2 {
-    color: #61dafb;
-    margin-bottom: 20px;
-  }
-  
-  .selected-genres-container .selected-genre-label {
-    background-color: #61dafb;
-    color: #20232a;
-    padding: 8px 16px;
-    border-radius: 20px;
-    margin: 5px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    display: inline-block;
-  }
-  
-  .selected-genres-container .selected-genre-label:hover {
-    transform: scale(1.05);
-  }
-  
-  .selected-genres-container .remove-icon {
-    margin-left: 5px;
-    cursor: pointer;
-  }
-  
-  .selected-genres-container .remove-icon:hover {
-    color: #000000; /* Change color on hover for visual feedback */
-  }
-  
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px; /* Provides some space between the labels */
+}
+.selected-genres-container {
+  margin: 20px auto;
+  padding: 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.1); /* Lighter background using opacity */
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  width: 80%;
+  max-width: 600px;
+}
+
+.selected-genres-container h2 {
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
+.selected-genre-label {
+  background-color: rgba(97, 218, 251, 0.3); /* Lighter shade of blue */
+  color: black; /* White color for text to ensure readability */
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 20px;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.selected-genre-label:hover, .selected-genre-label:focus {
+  background-color: #007bff; /* Slightly darker on hover/focus */
+}
+
+.remove-icon {
+  margin-left: 10px;
+  color: #FFFFFF; /* White color for the icon for consistency */
+  font-weight: bold;
+}
