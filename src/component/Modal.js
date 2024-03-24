@@ -1,5 +1,5 @@
 import React from 'react';
-import './Modal.css'; // Ensure you have styles for .selected
+import './css/Modal.css'; // Ensure you have styles for .selected
 
 function Modal({ genres, selectedGenres, onToggleGenre, onSubmit }) {
   return (
