@@ -18,7 +18,15 @@ const MovieGenres = ({ showModal, setShowModal }) => {
         return response.json();
       })
       .then(data => {
-        setGenres(data.genres);
+        // Check if 'data' is directly an array; if so, use it directly
+        if (Array.isArray(data)) {
+          setGenres(data);
+        } else if (data.genres && Array.isArray(data.genres)) {  // Fallback if data comes in expected object format
+          setGenres(data.genres);
+        } else {
+          console.error('Unexpected data format for genres:', data);
+          setError('Unexpected data format for genres');
+        }
         setIsLoading(false);
       })
       .catch(error => {
@@ -61,7 +69,7 @@ const MovieGenres = ({ showModal, setShowModal }) => {
               <label 
                 key={genre} 
                 className="selected-genre-label"
-                onClick={() => handleToggleGenre(genre)} // For removing a genre on click, you might adjust this logic
+                onClick={() => handleToggleGenre(genre)}
               >
                 {genre}
                 <span className="remove-icon">x</span>
@@ -73,6 +81,5 @@ const MovieGenres = ({ showModal, setShowModal }) => {
     </>
   );
 };
-
 
 export default MovieGenres;
