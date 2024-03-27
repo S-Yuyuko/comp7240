@@ -10,7 +10,7 @@ const MovieGenres = ({ showModal, setShowModal }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch('http://localhost:5000/get-genres')
+    fetch('http://localhost:4000/get-genres')
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch');

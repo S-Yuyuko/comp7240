@@ -1,0 +1,28 @@
+.App-header {
+    background-color: #343a40; /* Dark shade for the header */
+    color: #ffffff; /* White text color */
+    display: flex;
+    justify-content: space-between; /* Space between the title and button */
+    align-items: center; /* Vertically center content */
+    padding: 1rem 2rem; /* Adequate padding around the content */
+  }
+  
+  .header-content h1 {
+    margin: 0; /* Remove default margin */
+  }
+  
+  .genre-select-button {
+    background-color: #007bff; /* A bright, inviting blue for the button */
+    color: white; /* White text for contrast */
+    border: none; /* Remove default border */
+    padding: 0.5rem 1rem; /* Padding around the text */
+    border-radius: 0.25rem; /* Slightly rounded corners */
+    cursor: pointer; /* Change cursor to indicate clickability */
+    font-size: 1rem; /* Standard font size */
+    transition: background-color 0.2s; /* Smooth transition for hover effect */
+  }
+  
+  .genre-select-button:hover {
+    background-color: #0056b3; /* Darken the button on hover for feedback */
+  }
+  
