@@ -24,6 +24,6 @@ def extract_genres_to_json(csv_file_path):
         return json.dumps({'error': str(e)})
 
 # Example usage
-csv_file_path = 'express&pyscript\\csv\\mymoviedb.csv'
+csv_file_path = './csv/mymoviedb.csv'
 genres_json = extract_genres_to_json(csv_file_path)
 print(genres_json)
