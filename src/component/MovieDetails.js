@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './css/MovieDetails.css'; // Ensure the CSS file path is correct for your project structure
 
-const MovieDetails = () => {
+const MovieDetails = ({ setLoading }) => {
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -11,15 +11,19 @@ const MovieDetails = () => {
     // Function to fetch movies
     const loadMovies = () => {
       if (!hasMore) return;
-
+      setLoading(true);
       fetch(`http://localhost:4000/get-movie-details?page=${page}&limit=10`)
         .then(response => response.json())
         .then(newMovies => {
           setMovies(prevMovies => [...prevMovies, ...newMovies]);
           setPage(prevPage => prevPage + 1);
           setHasMore(newMovies.length > 0);
+          setLoading(false);
         })
-        .catch(error => console.error('Error fetching movies:', error));
+        .catch(error => {
+          console.error('Error fetching movies:', error);
+          setLoading(false); // Ensure loading is stopped in case of an error
+        });
     };
 
     // IntersectionObserver to trigger loading more movies
@@ -35,7 +39,7 @@ const MovieDetails = () => {
 
     // Clean up observer
     return () => observer.disconnect();
-  }, [page, hasMore]);
+  }, [page, hasMore, setLoading]);
 
   return (
     <div className="movie-container">

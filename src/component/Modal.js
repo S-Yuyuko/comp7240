@@ -1,7 +1,11 @@
 import React from 'react';
 import './css/Modal.css'; // Ensure you have styles for .selected
 
-function Modal({ genres, selectedGenres, onToggleGenre, onSubmit }) {
+function Modal({ genres, selectedGenres, onToggleGenre, onSubmit, onGenreSubmission }) {
+  const handleonGenreSubmission = () => {
+    onSubmit(); // Your existing submission logic
+    onGenreSubmission(); // The second function you want to run
+  }
   return (
     <div className="modal">
       <div className="modal-content">
@@ -11,7 +15,7 @@ function Modal({ genres, selectedGenres, onToggleGenre, onSubmit }) {
             {genre}
           </div>
         ))}
-        <button onClick={onSubmit}>Submit</button>
+        <button onClick={handleonGenreSubmission}>Submit</button>
       </div>
     </div>
   );

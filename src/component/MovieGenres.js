@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal'; // Ensure you have this component
 import './css/MovieGenres.css';
 
-const MovieGenres = ({ showModal, setShowModal }) => {
+const MovieGenres = ({ showModal, setShowModal, onGenreSubmission}) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [genres, setGenres] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,6 +59,7 @@ const MovieGenres = ({ showModal, setShowModal }) => {
           selectedGenres={selectedGenres}
           onToggleGenre={handleToggleGenre}
           onSubmit={handleSubmit}
+          onGenreSubmission={onGenreSubmission}
         />
       )}
       <div className="genre-display-container">
