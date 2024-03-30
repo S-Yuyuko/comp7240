@@ -1,40 +1,70 @@
-import React, { useState } from 'react';
-import './App.css'; // Ensure this contains the necessary styles for sidebar
+import React, { useState, useEffect } from 'react';
+import './App.css';
 import Header from './component/Header';
 import MovieDetails from './component/MovieDetails';
-import SideBarofMoviesLiked from './component/SideBarofMoviesLiked'; // Assuming Footer is your sidebar component
+import SideBar from './component/SideBar';
 
 function App() {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(false); // Controls sidebar visibility
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [likedMovies, setLikedMovies] = useState([]);
-
+  
   const handleLikeMovie = (movie) => {
     setLikedMovies(prevLikedMovies => {
       const isAlreadyLiked = prevLikedMovies.some(likedMovie => likedMovie.Title === movie.Title);
       if (!isAlreadyLiked) {
-        const updatedLikedMovies = [...prevLikedMovies, movie];
-        console.log(updatedLikedMovies); // This reflects the updated state
+        // Set initial score to null
+        const updatedLikedMovies = [...prevLikedMovies, { ...movie, Score: null }];
         return updatedLikedMovies;
       }
-      return prevLikedMovies; // Return previous state if the condition is not met
+      return prevLikedMovies;
     });
-  };
-  const handleGenreSubmission = () => {
-    setIsSubmitted(true);
-  };
-  // Calculate button right position based on sidebar visibility
-  const buttonRightPosition = isSidebarVisible ? '250px' : '0px';
-
-  // Toggle sidebar visibility
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
   };
 
   const handleRemoveMovie = (movieToRemove) => {
     setLikedMovies(likedMovies.filter(movie => movie.Title !== movieToRemove.Title));
   };
+
+  const handleScoreChange = (movieTitle, newScore) => {
+    console.log(`Score updated for "${movieTitle}" to: ${newScore}`);
+    setLikedMovies(prevLikedMovies =>
+      prevLikedMovies.map(movie =>
+        movie.Title === movieTitle ? { ...movie, Score: newScore } : movie
+      )
+    );
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
+
+  const handleGenreSubmission = () => {
+    setIsSubmitted(true);
+  };
+
+  useEffect(() => {
+    console.log('Liked movies state after update:', likedMovies);
+  }, [likedMovies]);
+
+  useEffect(() => {
+    const setAppMinWidth = () => {
+      const minWidth = window.screen.width * 0.5 + 'px'; // 50% of the screen width
+      document.querySelector('.App').style.minWidth = minWidth;
+    };
+
+    // Set the min width when the component mounts
+    setAppMinWidth();
+
+    // Add event listener for window resizing
+    window.addEventListener('resize', setAppMinWidth);
+
+    // Clean up event listener
+    return () => window.removeEventListener('resize', setAppMinWidth);
+  }, []);
+
+  const buttonRightPosition = isSidebarVisible ? '25%' : '0px';
+
   return (
     <div className="App">
       <Header onGenreSubmission={handleGenreSubmission} />
@@ -45,7 +75,7 @@ function App() {
             {loading && <div className="loading-indicator">Loading...</div>}
           </main>
           <div className={`sidebar-container ${isSidebarVisible ? 'visible' : ''}`}>
-            <SideBarofMoviesLiked likedMovies={likedMovies} onRemove={handleRemoveMovie} />
+            <SideBar likedMovies={likedMovies} onRemove={handleRemoveMovie} onScoreChange={handleScoreChange} />
             <button
               onClick={toggleSidebar}
               className="toggle-button"

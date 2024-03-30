@@ -1,0 +1,65 @@
+.sidebar {
+  overflow-y: auto
+}
+
+.sidebar h2 {
+  color: #ecf0f1;
+  margin: auto auto;
+  text-align: center;
+  border-bottom: 1px solid #7f8c8d;
+}
+
+.star {
+  cursor: pointer;
+  transition: color 200ms;
+  font-size: 18px; /* Increase this value to make stars bigger */
+  color: #ffc107; /* Star color */
+}
+s
+.liked-movies-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.liked-movie {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center-align the items horizontally */
+  margin-bottom: 20px; /* Spacing between movie items */
+  background-color: #f0f0f0; /* Light background color for each item */
+  padding: 10px;
+  border-radius: 8px; /* Optional: adds rounded corners */
+  width: 90%; /* Set a fixed width for the card */
+}
+
+.liked-movie-poster {
+  width: 100%; /* Make the poster width equal to the card width */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 4px; /* Optional: adds rounded corners to the image */
+  margin-bottom: 20px; /* Spacing between the image and the movie info */
+}
+
+.liked-movie-info {
+  text-align: center; /* Center-align the text */
+}
+
+.liked-movie-title {
+  margin: 0 0 10px 0; /* Add some margin below the title */
+  font-size: 16px; /* Adjust font size as needed */
+  font-weight: bold;
+}
+
+.remove-movie {
+  padding: 5px 10px; /* Padding inside the remove button */
+  background-color: #dc3545; /* Red background color */
+  color: white; /* White text color */
+  border: none; /* Removes the border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Changes the cursor to indicate it's clickable */
+  width: 100%; /* Make the button as wide as the card */
+}
+
+.remove-movie:hover {
+  background-color: #c82333; /* Darker shade of red on hover */
+}

@@ -12,7 +12,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  margin: auto; /* Centers the app in the available space */
+  min-height: 50vh;
+  min-width: 75vw;
   padding-top: 60px; /* Adjust if your header/menu height changes */
 }
 
@@ -77,8 +79,8 @@ body {
 .sidebar-container {
   position: fixed;
   top: 0;
-  right: -250px; /* Start hidden off-screen */
-  width: 250px;
+  right: -25%; /* Start hidden off-screen */
+  width: 25%;
   height: 100vh;
   background: #f4f4f4;
   transition: right 0.5s ease;

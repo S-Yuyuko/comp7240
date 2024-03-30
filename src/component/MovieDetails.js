@@ -29,7 +29,7 @@ const movieReducer = (state, action) => {
   }
 };
 
-const MovieDetails = ({ setLoading, onLike }) => {
+const MovieDetails = ({ setLoading, onLike, onToggleLike }) => {
   const [state, dispatch] = useReducer(movieReducer, {
     movies: [],
     displayedMovies: [],
@@ -77,7 +77,6 @@ const MovieDetails = ({ setLoading, onLike }) => {
             <p><strong>Release Date:</strong> {movie.Release_Date}</p>
             <p><strong>Popularity:</strong> {movie.Popularity}</p>
             <p><strong>Vote Count:</strong> {movie.Vote_Count}</p>
-            <p className="movie-overview">{movie.Overview}</p>
             <button onClick={() => onLike(movie)}>Like</button>
           </div>
         </div>
