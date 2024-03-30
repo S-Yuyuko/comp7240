@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #f0f2f5; /* A light grey background for a softer appearance */
+  background-color: #c4c5c7d4; /* A light grey background for a softer appearance */
   color: #333; /* Darker text for contrast */
   line-height: 1.6;
 }
@@ -43,7 +43,7 @@ body {
   padding: 20px;
   margin: 20px;
   width: 90%; /* Adjust the width as needed */
-  max-width: 800px; /* Ensures content doesn't get too wide on larger screens */
+  max-width: 80%; /* Ensures content doesn't get too wide on larger screens */
 }
 
 .App-header {

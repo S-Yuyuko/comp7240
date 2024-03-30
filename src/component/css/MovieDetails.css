@@ -6,7 +6,7 @@
   padding: 20px;
 }
 
-.movie-card {
+.movie-container .movie-card {
   width: 300px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -14,17 +14,17 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.movie-poster {
+.movie-container .movie-poster {
   width: 100%;
   height: 450px;
   object-fit: cover;
 }
 
-.movie-info {
+.movie-container .movie-info {
   padding: 15px;
 }
 
-.movie-title {
+.movie-container .movie-title {
   margin: 0;
   padding-bottom: 10px;
   font-size: 20px;

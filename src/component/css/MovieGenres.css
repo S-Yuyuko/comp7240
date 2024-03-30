@@ -29,7 +29,7 @@
 
 .selected-genre-label {
   background-color: rgba(97, 218, 251, 0.3); /* Lighter shade of blue */
-  color: black; /* White color for text to ensure readability */
+  color: white; /* White color for text to ensure readability */
   padding: 8px 16px;
   margin: 5px;
   border-radius: 20px;
@@ -40,6 +40,7 @@
 
 .selected-genre-label:hover, .selected-genre-label:focus {
   background-color: #007bff; /* Slightly darker on hover/focus */
+  
 }
 
 .remove-icon {

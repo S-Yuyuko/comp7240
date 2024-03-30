@@ -12,7 +12,8 @@
   }
   
   .modal-content {
-    background-color: #fff;
+    color: black;
+    background-color: lightgray;
     border-radius: 8px;
     padding: 20px;
     max-width: 500px; /* Adjust based on your preference */
@@ -22,6 +23,7 @@
   }
   
   .genre-item {
+    color:  black;
     cursor: pointer;
     display: inline-block; /* Display genre items side by side */
     margin: 10px;
