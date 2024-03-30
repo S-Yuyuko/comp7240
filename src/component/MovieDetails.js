@@ -1,10 +1,10 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import './css/MovieDetails.css';
 
 // Define action types
 const actionTypes = {
   FETCH_SUCCESS: 'FETCH_SUCCESS',
-  // Removed DISPLAY_MORE action type since we're not using loaderRef for infinite scrolling
+  DISPLAY_MORE: 'DISPLAY_MORE',
 };
 
 // Define the reducer function
@@ -14,10 +14,16 @@ const movieReducer = (state, action) => {
       return {
         ...state,
         movies: action.payload,
-        // Automatically display the first set of movies, no need for DISPLAY_MORE action
         displayedMovies: action.payload.slice(0, state.displayCount),
       };
-    // Removed DISPLAY_MORE case
+    case actionTypes.DISPLAY_MORE:
+      const newDisplayCount = state.displayCount + 10;
+      const newDisplayedMovies = state.movies.slice(0, newDisplayCount);
+      return {
+        ...state,
+        displayCount: newDisplayCount,
+        displayedMovies: newDisplayedMovies,
+      };
     default:
       throw new Error();
   }
@@ -27,12 +33,15 @@ const MovieDetails = ({ setLoading }) => {
   const [state, dispatch] = useReducer(movieReducer, {
     movies: [],
     displayedMovies: [],
-    displayCount: 10, // You can adjust this initial count as needed
+    displayCount: 10,
   });
+
+  const loaderRef = useRef();
 
   useEffect(() => {
     setLoading(true); // Assume setLoading is used to control global loading state
-    fetch('http://localhost:4000/get-movie-details') // Make sure the URL matches your API endpoint
+
+    fetch('http://localhost:4000/get-movie-details')
       .then(response => response.json())
       .then(data => {
         dispatch({ type: actionTypes.FETCH_SUCCESS, payload: data });
@@ -42,7 +51,21 @@ const MovieDetails = ({ setLoading }) => {
         console.error('Error fetching movies:', error);
         setLoading(false);
       });
-  }, [setLoading]); // setLoading is assumed to be a prop for controlling loading state globally
+
+  }, [setLoading]); // Dependency array
+
+  useEffect(() => {
+    const observerCallback = (entries) => {
+      if (entries[0].isIntersecting) {
+        dispatch({ type: actionTypes.DISPLAY_MORE });
+      }
+    };
+
+    const observer = new IntersectionObserver(observerCallback, { threshold: 1.0 });
+    if (loaderRef.current) observer.observe(loaderRef.current);
+
+    return () => observer.disconnect();
+  }, []); // Empty dependency array for component mount and unmount logic
 
   return (
     <div className="movie-container">
@@ -58,9 +81,8 @@ const MovieDetails = ({ setLoading }) => {
           </div>
         </div>
       ))}
-      {/* Removed the loader div */}
+      <div ref={loaderRef} className="loader"></div> {/* Always visible */}
     </div>
   );
 };
-
 export default MovieDetails;

@@ -1,18 +1,13 @@
-// Footer.js
 import React from 'react';
+import './css/Footer.css'; // Ensure the CSS file is correctly linked
 
-const Footer = ({ selectedMovie }) => {
+const Footer = () => {
   return (
-    <footer className="App-footer">
-      {selectedMovie ? (
-        <div>
-          <h3>{selectedMovie.title}</h3>
-          {/* Display other movie details as needed */}
-        </div>
-      ) : (
-        <p>No movie selected.</p>
-      )}
-    </footer>
+    <div className="footer-sidebar">
+      <h2>Sidebar Title</h2>
+      <p>Sidebar content goes here...</p>
+      {/* Add more sidebar content as needed */}
+    </div>
   );
 };
 

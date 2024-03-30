@@ -54,3 +54,69 @@ body {
   position: relative; /* Adjust if needed for positioning */
   top: -30px; /* Slight overlap with the menu for a layered look */
 }
+
+/* Loading indicator styles */
+.loading-indicator {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Additional styling */
+}
+/* Backdrop styles */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 999; /* Ensure it's below the sidebar and button but above other content */
+}
+
+/* Styles for the sidebar container */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  right: -250px; /* Start hidden off-screen */
+  width: 250px;
+  height: 100vh;
+  background: #f4f4f4;
+  transition: right 0.5s ease;
+  z-index: 1000; /* Ensure it's above most other content */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Adds shadow for depth */
+}
+
+.sidebar-container.visible {
+  right: 0; /* Move into view */
+}
+
+/* Styles for the toggle button */
+.toggle-button {
+  position: fixed;
+  top: 50%;
+  right: 20px; /* Adjust this to place the button near the edge of the screen or sidebar */
+  transform: translateY(-50%);
+  width: 40px; /* Diameter of the circle */
+  height: 40px; /* Diameter of the circle */
+  border-top-left-radius: 20px; /* Radius for top-left corner */
+        border-bottom-left-radius: 20px; /* Radius for bottom-left corner */
+        border-top-right-radius: 0; /* No radius for top-right corner */
+        border-bottom-right-radius: 0; /* No radius for bottom-right corner */
+  background-color: #007bff; /* Button color */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1001; /* Above the sidebar and backdrop */
+  transition: right 0.5s ease, transform 0.5s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Adds shadow for depth */
+}
+
+/* Adjust based on the sidebar's state, if needed */
+.sidebar-container.visible + .toggle-button {
+  /* Right position adjusted if needed based on sidebar visibility */
+  transform: translateY(-50%) rotate(180deg); /* Optional rotation for visual cue */
+}
