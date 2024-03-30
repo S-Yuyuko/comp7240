@@ -1,49 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './css/MovieDetails.css'; // Ensure the CSS file path is correct for your project structure
+import React, { useEffect, useReducer } from 'react';
+import './css/MovieDetails.css';
+
+// Define action types
+const actionTypes = {
+  FETCH_SUCCESS: 'FETCH_SUCCESS',
+  // Removed DISPLAY_MORE action type since we're not using loaderRef for infinite scrolling
+};
+
+// Define the reducer function
+const movieReducer = (state, action) => {
+  switch (action.type) {
+    case actionTypes.FETCH_SUCCESS:
+      return {
+        ...state,
+        movies: action.payload,
+        // Automatically display the first set of movies, no need for DISPLAY_MORE action
+        displayedMovies: action.payload.slice(0, state.displayCount),
+      };
+    // Removed DISPLAY_MORE case
+    default:
+      throw new Error();
+  }
+};
 
 const MovieDetails = ({ setLoading }) => {
-  const [movies, setMovies] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const loader = useRef(null);
+  const [state, dispatch] = useReducer(movieReducer, {
+    movies: [],
+    displayedMovies: [],
+    displayCount: 10, // You can adjust this initial count as needed
+  });
 
   useEffect(() => {
-    // Function to fetch movies
-    const loadMovies = () => {
-      if (!hasMore) return;
-      setLoading(true);
-      fetch(`http://localhost:4000/get-movie-details?page=${page}&limit=10`)
-        .then(response => response.json())
-        .then(newMovies => {
-          setMovies(prevMovies => [...prevMovies, ...newMovies]);
-          setPage(prevPage => prevPage + 1);
-          setHasMore(newMovies.length > 0);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching movies:', error);
-          setLoading(false); // Ensure loading is stopped in case of an error
-        });
-    };
-
-    // IntersectionObserver to trigger loading more movies
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        loadMovies();
-      }
-    }, { threshold: 1.0 });
-
-    if (loader.current) {
-      observer.observe(loader.current);
-    }
-
-    // Clean up observer
-    return () => observer.disconnect();
-  }, [page, hasMore, setLoading]);
+    setLoading(true); // Assume setLoading is used to control global loading state
+    fetch('http://localhost:4000/get-movie-details') // Make sure the URL matches your API endpoint
+      .then(response => response.json())
+      .then(data => {
+        dispatch({ type: actionTypes.FETCH_SUCCESS, payload: data });
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching movies:', error);
+        setLoading(false);
+      });
+  }, [setLoading]); // setLoading is assumed to be a prop for controlling loading state globally
 
   return (
     <div className="movie-container">
-      {movies.map((movie, index) => (
+      {state.displayedMovies.map((movie, index) => (
         <div key={index} className="movie-card">
           <img src={movie.Poster_Url} alt={movie.Title} className="movie-poster" />
           <div className="movie-info">
@@ -55,7 +58,7 @@ const MovieDetails = ({ setLoading }) => {
           </div>
         </div>
       ))}
-      <div ref={loader} className="loader"></div> {/* Sentinel element */}
+      {/* Removed the loader div */}
     </div>
   );
 };
