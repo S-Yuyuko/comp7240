@@ -28,8 +28,9 @@
 }
 
 .selected-genre-label {
-  background-color: rgba(97, 218, 251, 0.3); /* Lighter shade of blue */
-  color: white; /* White color for text to ensure readability */
+  border: 1px solid #007bff ;
+  background-color: lightgray; /* Lighter shade of blue */
+  color: black; /* White color for text to ensure readability */
   padding: 8px 16px;
   margin: 5px;
   border-radius: 20px;
@@ -40,11 +41,11 @@
 
 .selected-genre-label:hover, .selected-genre-label:focus {
   background-color: #007bff; /* Slightly darker on hover/focus */
-  
+  color: white;
 }
 
 .remove-icon {
   margin-left: 10px;
-  color: #FFFFFF; /* White color for the icon for consistency */
   font-weight: bold;
 }
+

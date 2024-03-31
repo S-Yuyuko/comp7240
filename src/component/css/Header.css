@@ -1,6 +1,6 @@
 .App-header {
-    background-color: #343a40; /* Dark shade for the header */
-    color: #ffffff; /* White text color */
+    background-color: #aeaaaa; /* Dark shade for the header */
+    color: #000000; /* White text color */
     display: flex;
     justify-content: space-between; /* Space between the title and button */
     align-items: center; /* Vertically center content */
