@@ -7,6 +7,8 @@
 }
 
 .movie-container .movie-card {
+  position: relative;
+  padding-bottom: 5%;
   width: 300px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -28,6 +30,12 @@
   margin: 0;
   padding-bottom: 10px;
   font-size: 20px;
+}
+.movie-info .like-button {
+  position: absolute;
+  bottom: 10px; /* Adjust based on desired distance from bottom */
+  left: 10px; /* Adjust based on desired distance from right */
+  /* Style your button */
 }
 
 .loader {

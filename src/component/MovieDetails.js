@@ -1,16 +1,14 @@
 import React, { useEffect, useReducer, useRef } from 'react';
 import './css/MovieDetails.css';
 
-// Define action types
 const actionTypes = {
-  FETCH_SUCCESS: 'FETCH_SUCCESS',
+  SET_MOVIES: 'SET_MOVIES', // Renamed for clarity
   DISPLAY_MORE: 'DISPLAY_MORE',
 };
 
-// Define the reducer function
 const movieReducer = (state, action) => {
   switch (action.type) {
-    case actionTypes.FETCH_SUCCESS:
+    case actionTypes.SET_MOVIES:
       return {
         ...state,
         movies: action.payload,
@@ -29,7 +27,7 @@ const movieReducer = (state, action) => {
   }
 };
 
-const MovieDetails = ({ setLoading, onLike, onToggleLike }) => {
+const MovieDetails = ({ recommendedMovies, setLoading, onLike }) => {
   const [state, dispatch] = useReducer(movieReducer, {
     movies: [],
     displayedMovies: [],
@@ -39,20 +37,11 @@ const MovieDetails = ({ setLoading, onLike, onToggleLike }) => {
   const loaderRef = useRef();
 
   useEffect(() => {
-    setLoading(true); // Assume setLoading is used to control global loading state
-
-    fetch('http://localhost:4000/get-movie-details')
-      .then(response => response.json())
-      .then(data => {
-        dispatch({ type: actionTypes.FETCH_SUCCESS, payload: data });
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching movies:', error);
-        setLoading(false);
-      });
-
-  }, [setLoading]); // Dependency array
+    // Assume setLoading might still be needed for other purposes
+    setLoading(true);
+    dispatch({ type: actionTypes.SET_MOVIES, payload: recommendedMovies });
+    setLoading(false);
+  }, [recommendedMovies, setLoading]);
 
   useEffect(() => {
     const observerCallback = (entries) => {
@@ -65,7 +54,7 @@ const MovieDetails = ({ setLoading, onLike, onToggleLike }) => {
     if (loaderRef.current) observer.observe(loaderRef.current);
 
     return () => observer.disconnect();
-  }, []); // Empty dependency array for component mount and unmount logic
+  }, []); // Dependency array remains empty for setup and cleanup logic
 
   return (
     <div className="movie-container">
@@ -77,7 +66,7 @@ const MovieDetails = ({ setLoading, onLike, onToggleLike }) => {
             <p><strong>Release Date:</strong> {movie.Release_Date}</p>
             <p><strong>Popularity:</strong> {movie.Popularity}</p>
             <p><strong>Vote Count:</strong> {movie.Vote_Count}</p>
-            <button onClick={() => onLike(movie)}>Like</button>
+            <button onClick={() => onLike(movie)} className="like-button">Like</button>
           </div>
         </div>
       ))}

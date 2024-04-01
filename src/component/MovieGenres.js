@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './Modal'; // Ensure you have this component
 import './css/MovieGenres.css';
 
-const MovieGenres = ({ showModal, setShowModal, onGenreSubmission}) => {
+const MovieGenres = ({ showModal, setShowModal, onGenreSubmission, onRecommendedMovies }) => {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [genres, setGenres] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -12,35 +12,40 @@ const MovieGenres = ({ showModal, setShowModal, onGenreSubmission}) => {
     setIsLoading(true);
     fetch('http://localhost:4000/get-genres')
       .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch');
-        }
+        if (!response.ok) throw new Error('Failed to fetch');
         return response.json();
       })
       .then(data => {
-        // Check if 'data' is directly an array; if so, use it directly
-        if (Array.isArray(data)) {
-          setGenres(data);
-        } else if (data.genres && Array.isArray(data.genres)) {  // Fallback if data comes in expected object format
-          setGenres(data.genres);
-        } else {
-          console.error('Unexpected data format for genres:', data);
-          setError('Unexpected data format for genres');
-        }
+        setGenres(Array.isArray(data) ? data : data.genres || []);
         setIsLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching genres:', error);
         setError(error.toString());
         setIsLoading(false);
       });
   }, []);
 
-  const handleToggleGenre = (genre) => {
-    setSelectedGenres(prev =>
-      prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-    );
-  };
+  // Debounce fetchRecommendedMovies
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      if (selectedGenres.length >= 0) {
+        fetch('http://localhost:4000/get-recommended-movies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ genres: selectedGenres }),
+        })
+        .then(response => response.json())
+        .then(data => onRecommendedMovies(data))
+        .catch(error => console.error('Error fetching recommended movies:', error));
+      }
+    }, 500); // 500 ms debounce period
+
+    return () => clearTimeout(timerId); // Cleanup on effect re-run or component unmount
+  }, [selectedGenres, onRecommendedMovies]);
+
+  const handleToggleGenre = useCallback((genre) => {
+    setSelectedGenres(prev => prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]);
+  }, []);
 
   const handleSubmit = () => {
     // Process the selected genres as needed
@@ -67,14 +72,14 @@ const MovieGenres = ({ showModal, setShowModal, onGenreSubmission}) => {
         {!showModal && (
           <div className="selected-genres-container">
             {selectedGenres.map(genre => (
-              <label 
+              <div 
                 key={genre} 
                 className="selected-genre-label"
                 onClick={() => handleToggleGenre(genre)}
               >
                 {genre}
                 <span className="remove-icon">x</span>
-              </label>
+              </div>
             ))}
           </div>
         )}

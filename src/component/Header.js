@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import MovieGenres from './MovieGenres';
 import './css/Header.css'; // Ensure this path matches your project structure
 
-const Header = ({ onGenreSubmission }) => {
+const Header = ({ onGenreSubmission, onRecommendedMovies }) => {
   const [showModal, setShowModal] = useState(true);
 
   return (
@@ -17,6 +17,7 @@ const Header = ({ onGenreSubmission }) => {
         onGenreSubmission={onGenreSubmission} 
         showModal={showModal}
         setShowModal={setShowModal}
+        onRecommendedMovies={onRecommendedMovies}
       />
     </header>
   );

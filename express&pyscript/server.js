@@ -65,6 +65,39 @@ app.get('/get-movie-details', (req, res) => {
     });
 });
 
+app.post('/get-recommended-movies', (req, res) => {
+    const genres = req.body.genres || [];
+    
+    // Spawn Python process
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
+    let dataString = '';
+
+    // Send function name and parameters to Python script via stdin
+    pythonProcess.stdin.write(JSON.stringify({ function: 'get_recommended_movies', genres: genres }));
+    pythonProcess.stdin.end();
+
+    // Collect data from script
+    pythonProcess.stdout.on('data', function(data) {
+        dataString += data.toString();
+    });
+
+    pythonProcess.on('close', function(code) {
+        console.log(`Received data: ${dataString}`); // Debug print
+        if (code !== 0 || !dataString) {
+            return res.status(500).send({ error: "Failed to execute Python script or received empty output" });
+        }
+        try {
+            const parsedData = JSON.parse(dataString);
+            res.send(parsedData);
+        } catch (error) {
+            console.error("Failed to parse JSON from Python script:", error);
+            res.status(500).send({ error: "Failed to parse JSON output from Python script" });
+        }
+    });
+    
+});
+
+
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });

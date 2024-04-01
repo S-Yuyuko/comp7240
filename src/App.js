@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Header from './component/Header';
 import MovieDetails from './component/MovieDetails';
@@ -9,6 +9,12 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [likedMovies, setLikedMovies] = useState([]);
+  const [recommendedMovies, setRecommendedMovies] = useState([]);
+
+  // Method to update the recommended movies
+  const handleRecommendedMovies = useCallback((movies) => {
+    setRecommendedMovies(movies);
+  }, []);
   
   const handleLikeMovie = (movie) => {
     setLikedMovies(prevLikedMovies => {
@@ -67,11 +73,11 @@ function App() {
 
   return (
     <div className="App">
-      <Header onGenreSubmission={handleGenreSubmission} />
+      <Header onGenreSubmission={handleGenreSubmission} onRecommendedMovies={handleRecommendedMovies} />
       {isSubmitted && (
         <>
           <main>
-            <MovieDetails setLoading={setLoading} onLike={handleLikeMovie} />
+            <MovieDetails setLoading={setLoading} onLike={handleLikeMovie} recommendedMovies={recommendedMovies} />
             {loading && <div className="loading-indicator">Loading...</div>}
           </main>
           <div className={`sidebar-container ${isSidebarVisible ? 'visible' : ''}`}>
