@@ -42,45 +42,50 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
         scaler = MinMaxScaler()
         movies_df[['Popularity', 'Vote_Count', 'Vote_Average']] = scaler.fit_transform(movies_df[['Popularity', 'Vote_Count', 'Vote_Average']])
 
-        # Calculate TF-IDF for genres and cosine similarity
+        # Calculate TF-IDF for genres and cosine similarity for the entire dataset
         tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
         tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'])
         cosine_sim_genres = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+        # Extracting genres from liked movies
+        liked_genres_matrix = tfidf_vectorizer.transform([', '.join({genre for movie in liked_movies for genre in movie['Genre'].split(', ')})])
+        genre_similarity_scores = cosine_similarity(liked_genres_matrix, tfidf_matrix).flatten()
 
         # Determine if history is empty
         is_history_empty = not historySubmit or all(len(v) == 0 for v in historySubmit.values())
 
         if is_history_empty:
-            # Process when history is empty
-            liked_genres = {genre for movie in liked_movies for genre in movie['Genre'].split(', ')}
-            related_genre_movies = movies_df[movies_df['Genre'].apply(lambda x: any(genre in x for genre in liked_genres))]
-            related_genre_movies['Combined_Metric'] = related_genre_movies[['Popularity', 'Vote_Count', 'Vote_Average']].mean(axis=1)
-            recommendations = related_genre_movies.sort_values(by='Combined_Metric', ascending=False).head(top_n)
+            # Directly use genre similarity for recommendations if history is empty
+            movies_df['Genre_Similarity'] = genre_similarity_scores
         else:
-            # Use liked_movies scores when history is present
+            # Factor in the scores from historySubmit and liked_movies if history is present
             comprehensive_list = liked_movies + [item for sublist in historySubmit.values() for item in sublist]
             movies_df['Score_Weighted'] = 0.0
 
             for movie in comprehensive_list:
                 if 'Score' in movie:
-                    # Find indices of movies in the DataFrame that match the liked movie by title
-                    indices = movies_df.index[movies_df['Title'] == movie['Title']].tolist()
-                    for idx in indices:
-                        # Update score based on user preference and genre similarity
-                        movies_df.at[idx, 'Score_Weighted'] += movie['Score'] * cosine_sim_genres[idx].mean()
+                    movie_genres_matrix = tfidf_vectorizer.transform([movie['Genre']])
+                    movie_genre_similarity = cosine_similarity(movie_genres_matrix, tfidf_matrix).flatten()
+                    movies_df['Score_Weighted'] += movie_genre_similarity * movie['Score']
 
-            # Normalize the Score_Weighted to be between 0 and 1
-            max_score = movies_df['Score_Weighted'].max()
-            if max_score > 0:
-                movies_df['Score_Weighted'] /= max_score
+            # Normalize Score_Weighted and add Genre_Similarity
+            max_score_weighted = movies_df['Score_Weighted'].max()
+            if max_score_weighted > 0:
+                movies_df['Score_Weighted'] /= max_score_weighted
+            movies_df['Genre_Similarity'] = genre_similarity_scores
 
-            # Combine with original scores
-            movies_df['Final_Score'] = (movies_df['Popularity'] + movies_df['Vote_Count'] + movies_df['Vote_Average'] + movies_df['Score_Weighted']) / 4
-            liked_titles = [movie['Title'] for movie in liked_movies]
-            filtered_recommendations = movies_df[~movies_df['Title'].isin(liked_titles)]
-            recommendations = filtered_recommendations.sort_values(by='Final_Score', ascending=False).head(top_n)
+        # Calculate the final score considering genre similarity and score weighted
+        movies_df['Final_Score'] = movies_df['Genre_Similarity'] + movies_df.get('Score_Weighted', 0)
+        movies_df['Final_Score'] /= 2  # Averaging the scores for a balanced metric
 
-        return recommendations.to_json(orient='records')
+        # Exclude movies already liked from the final recommendations
+        liked_titles = [movie['Title'] for movie in liked_movies]
+        filtered_recommendations = movies_df[~movies_df['Title'].isin(liked_titles)]
+
+        # Select top_n recommendations based on the final score
+        recommendations = filtered_recommendations.sort_values(by='Final_Score', ascending=False).head(top_n)
+
+        return recommendations[['Title', 'Genre', 'Final_Score']].to_json(orient='records')
     
     except Exception as e:
         return json.dumps({"error": str(e)})
