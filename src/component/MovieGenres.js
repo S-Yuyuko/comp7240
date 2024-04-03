@@ -38,7 +38,7 @@ const MovieGenres = ({ showModal, setShowModal, onGenreSubmission, onRecommended
         .then(data => onRecommendedMovies(data))
         .catch(error => console.error('Error fetching recommended movies:', error));
       }
-    }, 500); // 500 ms debounce period
+    }, 1000);
 
     return () => clearTimeout(timerId); // Cleanup on effect re-run or component unmount
   }, [selectedGenres, onRecommendedMovies]);
@@ -49,7 +49,6 @@ const MovieGenres = ({ showModal, setShowModal, onGenreSubmission, onRecommended
 
   const handleSubmit = () => {
     // Process the selected genres as needed
-    console.log('Selected Genres:', selectedGenres);
     setShowModal(false);
   };
 

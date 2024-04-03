@@ -1,5 +1,7 @@
 .sidebar {
-  overflow-y: auto
+  overflow-y: auto;
+  position: relative;
+  padding-bottom: 30px;
 }
 
 .sidebar h2 {
@@ -62,4 +64,11 @@ s
 
 .remove-movie:hover {
   background-color: #c82333; /* Darker shade of red on hover */
+}
+
+.submit-button {
+  position: absolute;/* Absolute positioning relative to the sidebar */
+  bottom: 0;
+  width: 100%; /* Make the button as wide as the sidebar */
+  /* Additional button styling (padding, background, border, etc.) */
 }

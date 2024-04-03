@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Header from './component/Header';
 import MovieDetails from './component/MovieDetails';
-import SideBar from './component/SideBar';
+import MovieSideBar from './component/MovieSideBar';
+import MovieRecommended from './component/MovieRecommended';
 
 function App() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -10,18 +11,31 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [likedMovies, setLikedMovies] = useState([]);
   const [recommendedMovies, setRecommendedMovies] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [recommendedUserMovies, setRecommendedUserMovies] = useState([]);
 
+  // This method now solely updates the recommended movies state
+  const updateRecommendedMovies = (movies) => {
+    setRecommendedUserMovies(movies);
+  };
+
+  // New method to control dialog visibility
+  const toggleDialogOpen = (openState = true) => {
+    setDialogOpen(openState);
+  };
+  
   // Method to update the recommended movies
   const handleRecommendedMovies = useCallback((movies) => {
     setRecommendedMovies(movies);
   }, []);
   
+
   const handleLikeMovie = (movie) => {
     setLikedMovies(prevLikedMovies => {
       const isAlreadyLiked = prevLikedMovies.some(likedMovie => likedMovie.Title === movie.Title);
       if (!isAlreadyLiked) {
-        // Set initial score to null
-        const updatedLikedMovies = [...prevLikedMovies, { ...movie, Score: null }];
+        // Set initial score to 0
+        const updatedLikedMovies = [...prevLikedMovies, { ...movie, Score: 0 }];
         return updatedLikedMovies;
       }
       return prevLikedMovies;
@@ -81,7 +95,11 @@ function App() {
             {loading && <div className="loading-indicator">Loading...</div>}
           </main>
           <div className={`sidebar-container ${isSidebarVisible ? 'visible' : ''}`}>
-            <SideBar likedMovies={likedMovies} onRemove={handleRemoveMovie} onScoreChange={handleScoreChange} />
+            <MovieSideBar likedMovies={likedMovies}
+              onRemove={handleRemoveMovie} 
+              onScoreChange={handleScoreChange}
+              onFetchRecommendations={updateRecommendedMovies}
+              toggleDialog={toggleDialogOpen} />
             <button
               onClick={toggleSidebar}
               className="toggle-button"
@@ -93,6 +111,11 @@ function App() {
           {isSidebarVisible && <div className="backdrop" onClick={toggleSidebar}></div>}
         </>
       )}
+      <MovieRecommended
+        open={dialogOpen}
+        onClose={() => toggleDialogOpen(false)}
+        recommendations={recommendedUserMovies}
+      />
     </div>
   );
 }

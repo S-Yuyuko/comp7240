@@ -40,7 +40,6 @@ const MovieDetails = ({ recommendedMovies, setLoading, onLike }) => {
     // Assume setLoading might still be needed for other purposes
     setLoading(true);
     dispatch({ type: actionTypes.SET_MOVIES, payload: recommendedMovies });
-    setLoading(false);
   }, [recommendedMovies, setLoading]);
 
   useEffect(() => {

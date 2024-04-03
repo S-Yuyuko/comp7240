@@ -36,34 +36,6 @@ app.get('/get-genres', (req, res) => {
         }
     });
 });
-app.get('/get-movie-details', (req, res) => {
-    const pythonProcess = spawn('python3', ['./process_movie_info.py']);
-
-    let dataString = '';
-    pythonProcess.stdout.on('data', (data) => {
-        dataString += data.toString();
-    });
-
-    pythonProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-            console.log(`Python script exited with code ${code}`);
-            return res.status(500).json({ error: "Failed to execute Python script" });
-        }
-
-        try {
-            const data = JSON.parse(dataString);
-            res.setHeader('Content-Type', 'application/json');
-            res.send(data);
-        } catch (error) {
-            console.error('Error parsing JSON from Python script:', error);
-            res.status(500).json({ error: "Error parsing JSON from Python script" });
-        }
-    });
-});
 
 app.post('/get-recommended-movies', (req, res) => {
     const genres = req.body.genres || [];
@@ -82,7 +54,6 @@ app.post('/get-recommended-movies', (req, res) => {
     });
 
     pythonProcess.on('close', function(code) {
-        console.log(`Received data: ${dataString}`); // Debug print
         if (code !== 0 || !dataString) {
             return res.status(500).send({ error: "Failed to execute Python script or received empty output" });
         }
@@ -95,6 +66,35 @@ app.post('/get-recommended-movies', (req, res) => {
         }
     });
     
+});
+
+app.post('/recommendations-from-liked', (req, res) => {
+    const likedMovies = req.body;
+    // Spawn the Python process
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
+    let dataString = '';
+
+    // Send the liked movies data to the Python script
+    pythonProcess.stdin.write(JSON.stringify({ function: 'generate_recommendations', likedMovies: likedMovies }));
+    pythonProcess.stdin.end();
+
+    // Collect data from script
+    pythonProcess.stdout.on('data', function(data) {
+        dataString += data.toString();
+    });
+
+    pythonProcess.on('close', function(code) {
+        if (code !== 0 || !dataString) {
+            return res.status(500).send({ error: "Failed to execute Python script or received empty output" });
+        }
+        try {
+            const parsedData = JSON.parse(dataString);
+            res.send(parsedData);
+        } catch (error) {
+            console.error("Failed to parse JSON from Python script:", error);
+            res.status(500).send({ error: "Failed to parse JSON output from Python script" });
+        }
+    });
 });
 
 
