@@ -85,11 +85,65 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
         # Select top_n recommendations based on the final score
         recommendations = filtered_recommendations.sort_values(by='Final_Score', ascending=False).head(top_n)
 
-        return recommendations[['Title', 'Genre', 'Final_Score']].to_json(orient='records')
+        return recommendations.to_json(orient='records')
     
     except Exception as e:
         return json.dumps({"error": str(e)})
-    
+
+def generate_adjusted_recommendations(feedback_movies, top_n=5):
+    """
+    Generate movie recommendations based on user feedback while excluding
+    feedback movies. Both adjusted scores and vote averages are normalized
+    before calculating the final score.
+
+    Args:
+    - feedback_movies: List of dictionaries with movie 'title', 'feedback' (like or dislike), and 'Genre'.
+    - top_n: Number of top recommendations to return.
+
+    Returns:
+    - JSON string of top_n adjusted movie recommendations.
+    """
+    try:
+        # Load and preprocess the dataset
+        movies_df = pd.read_csv(CSV_FILE_PATH)
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce')
+        movies_df.fillna({'Genre': '', 'Popularity': 0, 'Vote_Count': 0, 'Vote_Average': 0}, inplace=True)
+
+        # Initialize TF-IDF Vectorizer and calculate TF-IDF matrix for movie genres
+        tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'])
+
+        # Exclude movies that received feedback from the recommendations
+        feedback_titles = [movie['title'] for movie in feedback_movies]
+        movies_to_recommend = movies_df[~movies_df['Title'].isin(feedback_titles)].copy()
+
+        # Normalize the Vote_Average column
+        scaler = MinMaxScaler()
+        movies_to_recommend['Normalized_Vote_Average'] = scaler.fit_transform(movies_to_recommend[['Vote_Average']])
+
+        # Calculate adjusted scores based on feedback
+        movies_to_recommend['Adjusted_Score'] = 0.0
+        for feedback in feedback_movies:
+            feedback_genre_matrix = tfidf_vectorizer.transform([feedback['Genre']])
+            genre_similarity = cosine_similarity(feedback_genre_matrix, tfidf_matrix).flatten()
+            adjustment = 1 if feedback['feedback'] == 'like' else -1
+            movies_to_recommend['Adjusted_Score'] += genre_similarity * adjustment
+
+        # Normalize adjusted scores
+        movies_to_recommend['Adjusted_Score'] = scaler.fit_transform(movies_to_recommend[['Adjusted_Score']])
+
+        # Calculate the final score by averaging normalized adjusted score and normalized vote average
+        movies_to_recommend['Final_Score'] = (movies_to_recommend['Adjusted_Score'] + movies_to_recommend['Normalized_Vote_Average']) / 2
+
+        # Get top N recommendations based on the final score
+        recommendations = movies_to_recommend.sort_values(by='Final_Score', ascending=False).head(top_n)
+
+        return recommendations.to_json(orient='records')
+
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+
 def main():
     # Reading input from stdin
     input_str = sys.stdin.read()
@@ -103,6 +157,10 @@ def main():
         liked_movies = liked_movies_container.get('likedMovies', [])
         history_submit = liked_movies_container.get('historySubmit', [])
         result = generate_recommendations(liked_movies, history_submit)
+        print(result)   
+    elif input_json.get('function') == 'generate_adjusted_recommendations':
+        feedback_movies = input_json.get('feedback', [])
+        result = generate_adjusted_recommendations(feedback_movies)
         print(result)
     else :
         print(json.dumps({"error": "No valid function called."}))

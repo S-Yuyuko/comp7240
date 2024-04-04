@@ -1,91 +1,122 @@
-/* MoviesRecommended.css */
+/* Dialog Backdrop */
 .dialog-backdrop {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background-color: rgba(0, 0, 0, 0.5);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Darker backdrop for better focus */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
+/* Dialog Content */
 .dialog-content {
-position: relative; /* Add this line */
-background-color: #fff;
-padding: 20px;
-border-radius: 8px;
-max-width: 600px;
-width: 90%;
-overflow: hidden; /* Ensure overflow from child elements doesn't affect the dialog's shape */
-display: flex;
-flex-direction: column;
+    background-color: #cec9c9;
+    padding: 20px;
+    border-radius: 10px; /* Smoother edges */
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Soft shadow for depth */
+}
+
+/* Dialog Header */
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .close-button {
-cursor: pointer;
-border: none;
-background-color: transparent;
+    cursor: pointer;
+    border: none;
+    background-color: black; /* Mac-style close button color */
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Recommended Movie Card */
 .recommended-movie-card {
-display: flex;
-margin-bottom: 20px;
+    display: flex;
+    margin-bottom: 20px;
+    background: gainsboro; /* Light background for each card */
+    padding: 10px;
+    border-radius: 8px;
 }
 
 .recommended-movie-poster {
-width: 120px;
-height: auto;
-margin-right: 20px;
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+    margin-right: 20px;
 }
 
-.recommended-movie-info {
-flex: 1;
+.recommended-movie-info h3 {
+    margin-top: 0;
+    color: #333;
 }
 
+/* Actions */
 .recommended-movie-actions {
-display: flex;
-margin-top: 10px;
+    display: flex;
+    margin-top: 10px;
 }
 
 .action-button {
-margin-right: 10px;
-cursor: pointer;
-padding: 5px 10px;
-border: none;
-background-color: #efefef;
-border-radius: 5px;
-transition: transform 0.3s ease;
+    padding: 5px 15px;
+    border: none;
+    font-weight: bold;
+    margin-right: 10px;
+    border-radius: 20px; /* Rounded buttons */
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s; /* Smooth transform */
 }
 
-.liked, .disliked {
-transform: scale(1.1); /* Slightly larger when active */
+.action-button:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
 }
 
-/* Additional styles for active state */
 .liked {
-background-color: #90ee90;
+    background-color: #28a745; /* Bootstrap green */
 }
 
 .disliked {
-background-color: #ffcccb;
+    background-color: #dc3545; /* Bootstrap red */
 }
 
-/* Make the dialog body scrollable */
+/* Refresh Button */
+.refresh-button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Bootstrap primary blue */
+    color: white;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    width: fit-content; /* Auto-adjust width to content */
+    margin: 0 auto; /* Center the button horizontally */
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.refresh-button:hover {
+    background-color: #0056b3; /* Darker on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
 .dialog-body {
-overflow-y: auto; /* Enable vertical scrolling */
-max-height: 400px; /* Adjust max height as needed */
-margin-top: 20px;
-}
-
-.close-button {
-position: absolute; /* Position the button absolutely within .dialog-content */
-top: 10px; /* Adjust top and right values as needed */
-right: 10px;
-cursor: pointer;
-border: none;
-background-color: transparent;
-font-size: 1.5rem; /* Adjust size as needed */
+    max-height: 500px; /* Adjust based on your preference */
+    overflow-y: auto; /* Enable vertical scrolling */
+    margin-bottom: 20px; /* Space before the refresh button */
 }

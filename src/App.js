@@ -14,6 +14,11 @@ function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [recommendedUserMovies, setRecommendedUserMovies] = useState([]);
 
+
+    // Function to update recommendations
+  const handleUpdateRecommendations = (newRecommendations) => {
+    setRecommendedUserMovies(newRecommendations);
+  };
   // This method now solely updates the recommended movies state
   const updateRecommendedMovies = (movies) => {
     setRecommendedUserMovies(movies);
@@ -115,6 +120,7 @@ function App() {
         open={dialogOpen}
         onClose={() => toggleDialogOpen(false)}
         recommendations={recommendedUserMovies}
+        onUpdateRecommendations={handleUpdateRecommendations}
       />
     </div>
   );

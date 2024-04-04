@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import './css/MovieRecommended.css'; // Assuming you have a CSS file for styling
 
-const MovieRecommended = ({ open, onClose, recommendations }) => {
+const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendations }) => {
     const [likes, setLikes] = useState({});
 
     if (!open || !Array.isArray(recommendations)) return null; // Do not render the dialog if it's not open
@@ -20,6 +20,35 @@ const MovieRecommended = ({ open, onClose, recommendations }) => {
             [title]: prevLikes[title] === 'disliked' ? null : 'disliked'
         }));
     };
+
+    const handleRefresh = () => {
+        // Filter the likes object for movies that have a state of 'liked' or 'disliked'
+        const feedbackMovies = Object.entries(likes).reduce((acc, [title, state]) => {
+            if (state !== null) acc.push({ title, state });
+            return acc;
+        }, []);
+        console.log("Refreshed Movies:", feedbackMovies);
+        recommendedMoviesFromFeedbakcMovies(feedbackMovies)
+    };
+
+    const recommendedMoviesFromFeedbakcMovies = (feedbackMovies) => {
+        fetch('http://localhost:4000/recommendations-from-feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ feedbackMovies: feedbackMovies }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Assuming 'data' is the list of recommended movies
+          console.log(data);
+          onUpdateRecommendations(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      };
 
     return (
         <div className="dialog-backdrop" onClick={onClose}>
@@ -51,6 +80,7 @@ const MovieRecommended = ({ open, onClose, recommendations }) => {
                         </div>
                     ))}
                 </div>
+                <button onClick={handleRefresh} className="refresh-button">Refresh</button>
             </div>
         </div>
     );
