@@ -1,63 +1,34 @@
-import React, { useEffect, useReducer, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './css/MovieDetails.css';
 
-const actionTypes = {
-  SET_MOVIES: 'SET_MOVIES', // Renamed for clarity
-  DISPLAY_MORE: 'DISPLAY_MORE',
-};
-
-const movieReducer = (state, action) => {
-  switch (action.type) {
-    case actionTypes.SET_MOVIES:
-      return {
-        ...state,
-        movies: action.payload,
-        displayedMovies: action.payload.slice(0, state.displayCount),
-      };
-    case actionTypes.DISPLAY_MORE:
-      const newDisplayCount = state.displayCount + 10;
-      const newDisplayedMovies = state.movies.slice(0, newDisplayCount);
-      return {
-        ...state,
-        displayCount: newDisplayCount,
-        displayedMovies: newDisplayedMovies,
-      };
-    default:
-      throw new Error();
-  }
-};
-
 const MovieDetails = ({ recommendedMovies, setLoading, onLike }) => {
-  const [state, dispatch] = useReducer(movieReducer, {
-    movies: [],
-    displayedMovies: [],
-    displayCount: 10,
-  });
-
+  const [displayedMovies, setDisplayedMovies] = useState([]);
+  const [displayCount, setDisplayCount] = useState(10); // Assuming you want to start by displaying 10 movies
   const loaderRef = useRef();
 
   useEffect(() => {
-    // Assume setLoading might still be needed for other purposes
     setLoading(true);
-    dispatch({ type: actionTypes.SET_MOVIES, payload: recommendedMovies });
-  }, [recommendedMovies, setLoading]);
+    // Handle both object with a movies array and direct array
+    const moviesToDisplay = Array.isArray(recommendedMovies) ? recommendedMovies : recommendedMovies.movies || [];
+    setDisplayedMovies(moviesToDisplay.slice(0, displayCount));
+    setLoading(false);
+  }, [recommendedMovies, setLoading, displayCount]);
 
   useEffect(() => {
-    const observerCallback = (entries) => {
+    const observer = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting) {
-        dispatch({ type: actionTypes.DISPLAY_MORE });
+        setDisplayCount(prevDisplayCount => prevDisplayCount + 10); // Load more movies as you scroll
       }
-    };
+    }, { threshold: 1.0 });
 
-    const observer = new IntersectionObserver(observerCallback, { threshold: 1.0 });
     if (loaderRef.current) observer.observe(loaderRef.current);
 
-    return () => observer.disconnect();
-  }, []); // Dependency array remains empty for setup and cleanup logic
+    return () => observer && observer.disconnect();
+  }, []);
 
   return (
     <div className="movie-container">
-      {state.displayedMovies.map((movie, index) => (
+      {displayedMovies.map((movie, index) => (
         <div key={index} className="movie-card">
           <img src={movie.Poster_Url} alt={movie.Title} className="movie-poster" />
           <div className="movie-info">
@@ -69,8 +40,9 @@ const MovieDetails = ({ recommendedMovies, setLoading, onLike }) => {
           </div>
         </div>
       ))}
-      <div ref={loaderRef} className="loader"></div> {/* Always visible */}
+      <div ref={loaderRef} className="loader" style={{ height: '20px', width: '100%' }}></div> {/* Adjusted for visibility */}
     </div>
   );
 };
+
 export default MovieDetails;

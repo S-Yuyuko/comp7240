@@ -1,9 +1,9 @@
-// MoviesRecommended.js
 import React, { useState } from 'react';
 import './css/MovieRecommended.css'; // Assuming you have a CSS file for styling
 
 const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendations }) => {
     const [likes, setLikes] = useState({});
+    const [feedbackHistory, setFeedbackHistory] = useState([]); // New state for keeping feedback history
 
     if (!open || !Array.isArray(recommendations)) return null; // Do not render the dialog if it's not open
     
@@ -22,37 +22,50 @@ const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendati
     };
 
     const handleRefresh = () => {
-        // Filter the likes object for movies that have a state of 'liked' or 'disliked'
-        const feedbackMovies = Object.entries(likes).reduce((acc, [title, state]) => {
-            if (state !== null) acc.push({ title, state });
+        const feedbackMovies = recommendations.reduce((acc, movie) => {
+            const state = likes[movie.Title];
+            if (state !== null) {
+                acc.push({
+                    Title: movie.Title,
+                    State: state,
+                    Genre: movie.Genre // Assuming each movie object has a Genre property
+                });
+            }
             return acc;
         }, []);
-        console.log("Refreshed Movies:", feedbackMovies);
-        recommendedMoviesFromFeedbakcMovies(feedbackMovies)
+
+        // Update the feedback history with the latest feedback
+        setFeedbackHistory(prevHistory => [...prevHistory, ...feedbackMovies]);
+
+        console.log("Feedback History:", feedbackHistory);
+        console.log("Latest Feedback:", feedbackMovies);
+
+        recommendedMoviesFromFeedbackMovies(feedbackHistory + feedbackMovies);
     };
 
-    const recommendedMoviesFromFeedbakcMovies = (feedbackMovies) => {
+    const recommendedMoviesFromFeedbackMovies = (feedbackMovies) => {
         fetch('http://localhost:4000/recommendations-from-feedback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ feedbackMovies: feedbackMovies }),
+          // Include the entire feedback history in the request
+          body: JSON.stringify({ feedbackMovies: feedbackMovies }), 
         })
         .then(response => response.json())
         .then(data => {
-          // Assuming 'data' is the list of recommended movies
           console.log(data);
-          onUpdateRecommendations(data);
+          onUpdateRecommendations(data); // Updating recommendations based on feedback history
         })
         .catch(error => {
           console.error('Error:', error);
         });
-      };
+    };
 
     return (
         <div className="dialog-backdrop" onClick={onClose}>
             <div className="dialog-content" onClick={e => e.stopPropagation()}>
+                {/* Dialog header and body as before */}
                 <div className="dialog-header">
                     <h2>Recommended Movies</h2>
                     <button onClick={onClose} className="close-button">X</button>
