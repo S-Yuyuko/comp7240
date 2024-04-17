@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './css/MovieSideBar.css'; // Ensure the CSS file is correctly linked
 
-const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, toggleDialog }) => {
+const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, toggleDialog, updateHistorySubmit }) => {
   const [historySubmit, setHistorySubmit] = useState([]);
   const [submitCount, setSubmitCount] = useState(0);
 
@@ -30,15 +30,26 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
   };
   
   const handleSubmit = () => {
+      // Check if likedMovies is null or an empty array
+    if (!likedMovies || likedMovies.length === 0) {
+      console.log("No liked movies to submit."); // Optional: for debugging
+      return; // Exit the function if no liked movies
+    }
     recommendedMoviesFromLikedMovies(likedMovies);
     setHistorySubmit(prevHistory => ({
       ...prevHistory,
       [submitCount]: likedMovies
     }));
-    
     // Increment the submission counter
     setSubmitCount(prevCount => prevCount + 1);
   };
+
+  // useEffect to send updates to App.js when historySubmit changes
+  useEffect(() => {
+    if (Object.keys(historySubmit).length > 0) {
+      updateHistorySubmit(historySubmit);
+    }
+  }, [historySubmit, updateHistorySubmit]);
 
   const recommendedMoviesFromLikedMovies = (likedMovies) => {
     fetch('http://localhost:4000/recommendations-from-liked', {

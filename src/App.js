@@ -13,7 +13,17 @@ function App() {
   const [recommendedMovies, setRecommendedMovies] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [recommendedUserMovies, setRecommendedUserMovies] = useState([]);
+  const [historySubmit, setHistorySubmit] = useState([]);
 
+  const handleEvaluation = () => {
+    console.log("Evaluation button clicked");
+    // Insert any logic for handling the evaluation process
+  };
+  
+  const handleUpdateHistorySubmit = (newHistory) => {
+    setHistorySubmit(newHistory);
+    console.log("Updated History Submit:", historySubmit);
+  };
 
     // Function to update recommendations
   const handleUpdateRecommendations = (newRecommendations) => {
@@ -100,11 +110,13 @@ function App() {
             {loading && <div className="loading-indicator">Loading...</div>}
           </main>
           <div className={`sidebar-container ${isSidebarVisible ? 'visible' : ''}`}>
-            <MovieSideBar likedMovies={likedMovies}
+            <MovieSideBar 
+              likedMovies={likedMovies}
               onRemove={handleRemoveMovie} 
               onScoreChange={handleScoreChange}
               onFetchRecommendations={updateRecommendedMovies}
-              toggleDialog={toggleDialogOpen} />
+              toggleDialog={toggleDialogOpen}
+              updateHistorySubmit={handleUpdateHistorySubmit} />
             <button
               onClick={toggleSidebar}
               className="toggle-button"
@@ -122,6 +134,9 @@ function App() {
         recommendations={recommendedUserMovies}
         onUpdateRecommendations={handleUpdateRecommendations}
       />
+      <button className="evaluation-button" onClick={handleEvaluation}>
+        Evaluate
+      </button>
     </div>
   );
 }
