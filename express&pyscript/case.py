@@ -13,8 +13,8 @@ liked_movies = [
     {'Title': 'Interstellar', 'Score': 9.1, 'Genre': 'Adventure, Drama, Science Fiction'}
 ]
 # Assuming this path; update it to your actual CSV file location
-csv_file_path = 'express&pyscript\\csv\\mymoviedb.csv'
-ratings_csv_path= 'express&pyscript\\csv\\user_ratings.csv'
+csv_file_path = 'express&pyscript/csv/mymoviedb.csv'
+ratings_csv_path= 'express&pyscript/csv/user_ratings.csv'
 
 def get_recommended_movies(genres):
     try:
@@ -47,7 +47,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Normalize features using MinMaxScaler
         scaler = MinMaxScaler()
-        movies_df[['Popularity', 'Vote_Count', 'Vote_Average']] = scaler.fit_transform(
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
             movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
         )
 
@@ -85,7 +85,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Calculate CF scores using cosine similarity
         user_similarity = cosine_similarity(user_item_matrix.T)  # Transpose to get item-item similarity
-        cf_scores = user_similarity.mean(axis=0)
+        cf_scores = user_similarity.mean(axis=0) * 1000
 
         # Calculate genre similarity scores
         liked_movie_titles = [movie['Title'] for movie in liked_movies]
@@ -93,7 +93,18 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
         liked_genres_scores = cosine_similarity(genre_tfidf_matrix, genre_tfidf_matrix[liked_indices]).mean(axis=1)
 
         # Combine CF and CBF scores
-        final_scores = (cf_scores + liked_genres_scores) / 2
+        weight_cf = 0.4
+        weight_cbf = 0.4
+        weight_popularity = 0.05
+        weight_vote_count = 0.05
+        weight_vote_average = 0.1
+                # Apply weights
+        final_scores = (cf_scores * weight_cf + 
+                        liked_genres_scores * weight_cbf + 
+                        movies_df['Nor_Popularity'] * weight_popularity + 
+                        movies_df['Nor_Vote_Count'] * weight_vote_count + 
+                        movies_df['Nor_Vote_Average'] * weight_vote_average)
+
         movie_indices = np.argsort(final_scores)[-top_n:][::-1]
         recommended_movies = movies_df.iloc[movie_indices]
 

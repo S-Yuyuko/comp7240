@@ -21,7 +21,7 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
                   className="star"
                   onClick={() => handleStarClick(ratingValue)}
                   style={{ cursor: 'pointer', color: ratingValue <= (movie.Score || 0) ? '#ffc107' : '#e4e5e9', fontSize: '24px' }}>
-              °Ô
+              ‚≠êÔ∏è
             </span>
           );
         })}
@@ -46,6 +46,7 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
   useEffect(() => {
     if (likedMovies.length > 0) {
       recommendedMoviesFromLikedMovies(likedMovies);
+      console.log(historySubmit)
     }
   }, [submitCount]);
 
