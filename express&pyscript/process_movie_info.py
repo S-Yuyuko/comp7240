@@ -57,7 +57,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Update ratings DataFrame with new history data
         new_data = []
-        new_user_id = ratings_df['User_ID'].max() + 1 if not ratings_df.empty else 1
+        new_user_id = int(ratings_df['User_ID'].iloc[-1]) + 1 if not ratings_df.empty else 1
         for _, movies in historySubmit.items():
             for movie in movies:
                 new_data.append({

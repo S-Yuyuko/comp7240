@@ -4,6 +4,7 @@ import './css/MovieRecommended.css'; // Assuming you have a CSS file for styling
 const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendations }) => {
     const [likes, setLikes] = useState({});
     const [feedbackHistory, setFeedbackHistory] = useState([]); // New state for keeping feedback history
+    const [activeTab, setActiveTab] = useState('hybrid')
 
     if (!open || !Array.isArray(recommendations)) return null; // Do not render the dialog if it's not open
     
@@ -61,39 +62,114 @@ const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendati
           console.error('Error:', error);
         });
     };
+    // Internal component for Hybrid Recommendations
+    const HybridRecommendations = () => (
+        <>
+            <div className="dialog-body">
+                {recommendations.map((movie, index) => (
+                    <div key={index} className="recommended-movie-card">
+                        <img src={movie.Poster_Url} alt={movie.Title} className="recommended-movie-poster" />
+                        <div className="recommended-movie-info">
+                            <h3>{movie.Title}</h3>
+                            <p>Recommended Reason: {movie.Reason}</p>
+                            <div className="recommended-movie-actions">
+                                <button 
+                                    onClick={() => toggleLike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'liked' ? 'active liked' : ''}`}>
+                                    Like
+                                </button>
+                                <button 
+                                    onClick={() => toggleDislike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'disliked' ? 'active disliked' : ''}`}>
+                                    Dislike
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={handleRefresh} className="refresh-button">Refresh</button>
+        </>
+    );
+
+    // Internal component for Non-Hybrid A Recommendations
+    const NonHybridARecommendations = () => (
+        <>
+            <div className="dialog-body">
+                {recommendations.map((movie, index) => (
+                    <div key={index} className="recommended-movie-card">
+                        <img src={movie.Poster_Url} alt={movie.Title} className="recommended-movie-poster" />
+                        <div className="recommended-movie-info">
+                            <h3>{movie.Title}</h3>
+                            <p>Recommended Reason: {movie.Reason}</p>
+                            <div className="recommended-movie-actions">
+                                <button 
+                                    onClick={() => toggleLike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'liked' ? 'active liked' : ''}`}>
+                                    Like
+                                </button>
+                                <button 
+                                    onClick={() => toggleDislike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'disliked' ? 'active disliked' : ''}`}>
+                                    Dislike
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={handleRefresh} className="refresh-button">Refresh</button>
+        </>
+
+    );
+
+    // Internal component for Non-Hybrid B Recommendations
+    const NonHybridBRecommendations = () => (
+        <>
+            <div className="dialog-body">
+                {recommendations.map((movie, index) => (
+                    <div key={index} className="recommended-movie-card">
+                        <img src={movie.Poster_Url} alt={movie.Title} className="recommended-movie-poster" />
+                        <div className="recommended-movie-info">
+                            <h3>{movie.Title}</h3>
+                            <p>Recommended Reason: {movie.Reason}</p>
+                            <div className="recommended-movie-actions">
+                                <button 
+                                    onClick={() => toggleLike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'liked' ? 'active liked' : ''}`}>
+                                    Like
+                                </button>
+                                <button 
+                                    onClick={() => toggleDislike(movie.Title)} 
+                                    className={`action-button ${likes[movie.Title] === 'disliked' ? 'active disliked' : ''}`}>
+                                    Dislike
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={handleRefresh} className="refresh-button">Refresh</button>
+        </>
+    );
 
     return (
         <div className="dialog-backdrop" onClick={onClose}>
             <div className="dialog-content" onClick={e => e.stopPropagation()}>
-                {/* Dialog header and body as before */}
                 <div className="dialog-header">
                     <h2>Recommended Movies</h2>
                     <button onClick={onClose} className="close-button">X</button>
                 </div>
-                <div className="dialog-body">
-                    {recommendations.map((movie, index) => (
-                        <div key={index} className="recommended-movie-card">
-                            <img src={movie.Poster_Url} alt={movie.Title} className="recommended-movie-poster" />
-                            <div className="recommended-movie-info">
-                                <h3>{movie.Title}</h3>
-                                <p>Recommended Reason: {movie.Reason}</p>
-                                <div className="recommended-movie-actions">
-                                    <button 
-                                        onClick={() => toggleLike(movie.Title)} 
-                                        className={`action-button ${likes[movie.Title] === 'liked' ? 'active liked' : ''}`}>
-                                        Like
-                                    </button>
-                                    <button 
-                                        onClick={() => toggleDislike(movie.Title)} 
-                                        className={`action-button ${likes[movie.Title] === 'disliked' ? 'active disliked' : ''}`}>
-                                        Dislike
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                <div className="tabs">
+                    <button onClick={() => setActiveTab('hybrid')} className={activeTab === 'hybrid' ? 'active' : ''}>Hybrid Algorithm</button>
+                    <button onClick={() => setActiveTab('nonHybridA')} className={activeTab === 'nonHybridA' ? 'active' : ''}>Non-Hybrid A</button>
+                    <button onClick={() => setActiveTab('nonHybridB')} className={activeTab === 'nonHybridB' ? 'active' : ''}>Non-Hybrid B</button>
                 </div>
-                <button onClick={handleRefresh} className="refresh-button">Refresh</button>
+                <>
+                    {activeTab === 'hybrid' && <HybridRecommendations />}
+                    {activeTab === 'nonHybridA' && <NonHybridARecommendations />}
+                    {activeTab === 'nonHybridB' && <NonHybridBRecommendations />}
+                </>
             </div>
         </div>
     );
