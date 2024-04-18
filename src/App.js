@@ -13,18 +13,11 @@ function App() {
   const [recommendedMovies, setRecommendedMovies] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [recommendedUserMovies, setRecommendedUserMovies] = useState([]);
-  const [historySubmit, setHistorySubmit] = useState([]);
 
   const handleEvaluation = () => {
     console.log("Evaluation button clicked");
     // Insert any logic for handling the evaluation process
   };
-  
-  const handleUpdateHistorySubmit = (newHistory) => {
-    setHistorySubmit(newHistory);
-    console.log("Updated History Submit:", historySubmit);
-  };
-
     // Function to update recommendations
   const handleUpdateRecommendations = (newRecommendations) => {
     setRecommendedUserMovies(newRecommendations);
@@ -115,8 +108,7 @@ function App() {
               onRemove={handleRemoveMovie} 
               onScoreChange={handleScoreChange}
               onFetchRecommendations={updateRecommendedMovies}
-              toggleDialog={toggleDialogOpen}
-              updateHistorySubmit={handleUpdateHistorySubmit} />
+              toggleDialog={toggleDialogOpen} />
             <button
               onClick={toggleSidebar}
               className="toggle-button"

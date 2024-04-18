@@ -76,7 +76,7 @@ const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendati
                             <img src={movie.Poster_Url} alt={movie.Title} className="recommended-movie-poster" />
                             <div className="recommended-movie-info">
                                 <h3>{movie.Title}</h3>
-                                <p>Final Score: {movie.Final_Score}</p>
+                                <p>Recommended Reason: {movie.Reason}</p>
                                 <div className="recommended-movie-actions">
                                     <button 
                                         onClick={() => toggleLike(movie.Title)} 

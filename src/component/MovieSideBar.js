@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './css/MovieSideBar.css'; // Ensure the CSS file is correctly linked
 
-const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, toggleDialog, updateHistorySubmit }) => {
+const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, toggleDialog }) => {
   const [historySubmit, setHistorySubmit] = useState([]);
   const [submitCount, setSubmitCount] = useState(0);
 
@@ -21,7 +21,7 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
                   className="star"
                   onClick={() => handleStarClick(ratingValue)}
                   style={{ cursor: 'pointer', color: ratingValue <= (movie.Score || 0) ? '#ffc107' : '#e4e5e9', fontSize: '24px' }}>
-              â˜…
+              ¡ï
             </span>
           );
         })}
@@ -35,21 +35,19 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
       console.log("No liked movies to submit."); // Optional: for debugging
       return; // Exit the function if no liked movies
     }
-    recommendedMoviesFromLikedMovies(likedMovies);
-    setHistorySubmit(prevHistory => ({
-      ...prevHistory,
+    setHistorySubmit({
       [submitCount]: likedMovies
-    }));
+    });
     // Increment the submission counter
     setSubmitCount(prevCount => prevCount + 1);
+
   };
 
-  // useEffect to send updates to App.js when historySubmit changes
   useEffect(() => {
-    if (Object.keys(historySubmit).length > 0) {
-      updateHistorySubmit(historySubmit);
+    if (likedMovies.length > 0) {
+      recommendedMoviesFromLikedMovies(likedMovies);
     }
-  }, [historySubmit, updateHistorySubmit]);
+  }, [submitCount]);
 
   const recommendedMoviesFromLikedMovies = (likedMovies) => {
     fetch('http://localhost:4000/recommendations-from-liked', {
