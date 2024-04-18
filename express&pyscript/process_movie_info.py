@@ -41,7 +41,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Normalize features using MinMaxScaler
         scaler = MinMaxScaler()
-        movies_df[['Popularity', 'Vote_Count', 'Vote_Average']] = scaler.fit_transform(
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
             movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
         )
 
@@ -79,7 +79,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Calculate CF scores using cosine similarity
         user_similarity = cosine_similarity(user_item_matrix.T)  # Transpose to get item-item similarity
-        cf_scores = user_similarity.mean(axis=0)
+        cf_scores = user_similarity.mean(axis=0) * 1000
 
         # Calculate genre similarity scores
         liked_movie_titles = [movie['Title'] for movie in liked_movies]
@@ -87,7 +87,12 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
         liked_genres_scores = cosine_similarity(genre_tfidf_matrix, genre_tfidf_matrix[liked_indices]).mean(axis=1)
 
         # Combine CF and CBF scores
-        final_scores = (cf_scores + liked_genres_scores) / 2
+        weights = {'cf': 0.4, 'cbf': 0.4, 'popularity': 0.05, 'vote_count': 0.05, 'vote_average': 0.1}
+        final_scores = (cf_scores * weights['cf'] +
+                        liked_genres_scores * weights['cbf'] +
+                        movies_df['Nor_Popularity'] * weights['popularity'] +
+                        movies_df['Nor_Vote_Count'] * weights['vote_count'] +
+                        movies_df['Nor_Vote_Average'] * weights['vote_average'])
         movie_indices = np.argsort(final_scores)[-top_n:][::-1]
         recommended_movies = movies_df.iloc[movie_indices]
 

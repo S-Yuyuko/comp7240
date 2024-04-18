@@ -8,7 +8,7 @@ app.use(cors()); // Enable CORS
 app.use(express.json()); // Middleware to parse JSON bodies
 
 app.get('/get-genres', (req, res) => {
-    const pythonProcess = spawn('python', ['./process_genres.py']); // Adjust the path as needed
+    const pythonProcess = spawn('python3', ['./process_genres.py']); // Adjust the path as needed
 
     let dataString = '';
     pythonProcess.stdout.on('data', (data) => {
@@ -41,7 +41,7 @@ app.post('/get-recommended-movies', (req, res) => {
     const genres = req.body.genres || [];
     
     // Spawn Python process
-    const pythonProcess = spawn('python', ['process_movie_info.py']);
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
     let dataString = '';
 
     // Send function name and parameters to Python script via stdin
@@ -71,7 +71,7 @@ app.post('/get-recommended-movies', (req, res) => {
 app.post('/recommendations-from-liked', (req, res) => {
     const likedMovies = req.body;
     // Spawn the Python process
-    const pythonProcess = spawn('python', ['process_movie_info.py']);
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
     let dataString = '';
 
     // Send the liked movies data to the Python script
@@ -100,7 +100,7 @@ app.post('/recommendations-from-liked', (req, res) => {
 app.post('/recommendations-from-liked', (req, res) => {
     const likedMovies = req.body;
     // Spawn the Python process
-    const pythonProcess = spawn('python', ['process_movie_info.py']);
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
     let dataString = '';
 
     // Send the liked movies data to the Python script
@@ -129,7 +129,7 @@ app.post('/recommendations-from-liked', (req, res) => {
 app.post('/recommendations-from-feedback', (req, res) => {
     const feedbackMovies = req.body;
     // Spawn the Python process
-    const pythonProcess = spawn('python', ['process_movie_info.py']);
+    const pythonProcess = spawn('python3', ['process_movie_info.py']);
     let dataString = '';
 
     // Send the liked movies data to the Python script
