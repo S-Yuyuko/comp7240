@@ -1,0 +1,147 @@
+{
+    "feedbackMovies": [
+        {
+            "Title": "Robin Hood",
+            "State": "disliked",
+            "Genre": "Adventure, Action, Thriller",
+            "User_ID": 5036
+        },
+        {
+            "Title": "King Kong",
+            "State": "disliked",
+            "Genre": "Adventure, Drama, Action",
+            "User_ID": 5036
+        },
+        {
+            "Title": "The Avengers",
+            "State": "disliked",
+            "Genre": "Science Fiction, Action, Adventure",
+            "User_ID": 5036
+        },
+        {
+            "Title": "Batman",
+            "State": "disliked",
+            "Genre": "Action, Adventure, Crime, Science Fiction, Thriller, War",
+            "User_ID": 5036
+        },
+        {
+            "Title": "The Courier",
+            "State": "disliked",
+            "Genre": "Crime, Action, Drama, Thriller",
+            "User_ID": 5036
+        }
+    ]
+}
+[
+    {
+        "Release_Date": "2021-09-30",
+        "Title": "Venom: Let There Be Carnage",
+        "Overview": "After finding a host body in investigative reporter Eddie Brock, the alien symbiote must face a new enemy, Carnage, the alter ego of serial killer Cletus Kasady.",
+        "Popularity": 1053.615,
+        "Vote_Count": "6539",
+        "Vote_Average": "7.1",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/rjkmN1dniUHVYAtwuV3Tji7FsDO.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    },
+    {
+        "Release_Date": "2021-12-16",
+        "Title": "The Matrix Resurrections",
+        "Overview": "Plagued by strange memories, Neo's life takes an unexpected turn when he finds himself back inside the Matrix.",
+        "Popularity": 941.024,
+        "Vote_Count": "3160",
+        "Vote_Average": "6.8",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/8c4a8kE7PizaGQQnditMmI1xbRp.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    }
+]
+[
+    {
+        "Release_Date": "2021-09-30",
+        "Title": "Venom: Let There Be Carnage",
+        "Overview": "After finding a host body in investigative reporter Eddie Brock, the alien symbiote must face a new enemy, Carnage, the alter ego of serial killer Cletus Kasady.",
+        "Popularity": 1053.615,
+        "Vote_Count": "6539",
+        "Vote_Average": "7.1",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/rjkmN1dniUHVYAtwuV3Tji7FsDO.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    },
+    {
+        "Release_Date": "2021-12-16",
+        "Title": "The Matrix Resurrections",
+        "Overview": "Plagued by strange memories, Neo's life takes an unexpected turn when he finds himself back inside the Matrix.",
+        "Popularity": 941.024,
+        "Vote_Count": "3160",
+        "Vote_Average": "6.8",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/8c4a8kE7PizaGQQnditMmI1xbRp.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    }
+]
+{
+    "feedbackMovies": [
+        {
+            "Title": "The Avengers",
+            "Genre": "Science Fiction, Action, Adventure",
+            "User_ID": 5039
+        },
+        {
+            "Title": "Star Trek Into Darkness",
+            "Genre": "Action, Adventure, Science Fiction",
+            "User_ID": 5039
+        },
+        {
+            "Title": "Star Wars",
+            "Genre": "Adventure, Action, Science Fiction",
+            "User_ID": 5039
+        },
+        {
+            "Title": "Spider-Man: No Way Home",
+            "Genre": "Action, Adventure, Science Fiction",
+            "User_ID": 5039
+        },
+        {
+            "Title": "King Kong",
+            "Genre": "Adventure, Horror, Science Fiction",
+            "User_ID": 5039
+        }
+    ]
+}
+[
+    {
+        "Release_Date": "2021-09-30",
+        "Title": "Venom: Let There Be Carnage",
+        "Overview": "After finding a host body in investigative reporter Eddie Brock, the alien symbiote must face a new enemy, Carnage, the alter ego of serial killer Cletus Kasady.",
+        "Popularity": 1053.615,
+        "Vote_Count": "6539",
+        "Vote_Average": "7.1",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/rjkmN1dniUHVYAtwuV3Tji7FsDO.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    },
+    {
+        "Release_Date": "2021-12-16",
+        "Title": "The Matrix Resurrections",
+        "Overview": "Plagued by strange memories, Neo's life takes an unexpected turn when he finds himself back inside the Matrix.",
+        "Popularity": 941.024,
+        "Vote_Count": "3160",
+        "Vote_Average": "6.8",
+        "Original_Language": "en",
+        "Genre": "Science Fiction, Action, Adventure",
+        "Poster_Url": "https://image.tmdb.org/t/p/original/8c4a8kE7PizaGQQnditMmI1xbRp.jpg",
+        "GenreMatch": true,
+        "Score": 0
+    }
+]

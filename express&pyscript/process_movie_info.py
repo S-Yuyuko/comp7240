@@ -8,8 +8,10 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Assuming this path; update it to your actual CSV file location
+base_directory = './csv'
 csv_file_path = './csv/mymoviedb.csv'
 ratings_csv_path='./csv/user_ratings.csv'
+feedback_csv_path = os.path.join(base_directory, 'Hy_Recommendations.csv')
 def get_recommended_movies(genres):
     try:
         df = pd.read_csv(csv_file_path)
@@ -32,7 +34,7 @@ def get_recommended_movies(genres):
     
 
 def generate_recommendations(liked_movies, historySubmit, top_n=5):
-    try:
+    try:     
         # Load and preprocess the movie dataset
         movies_df = pd.read_csv(csv_file_path)
         movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
@@ -98,6 +100,7 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
 
         # Format recommended movies with reasons
         recommendations = [{
+            'User_ID': new_user_id,
             'Title': movie.Title,  # Correctly accessing attributes of a named tuple
             'Release_Date': movie.Release_Date,
             'Overview': movie.Overview,
@@ -118,37 +121,38 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
            
 def generate_adjusted_recommendations(feedback_movies, top_n=5):
     try:
+        # Load and preprocess the movie dataset
         movies_df = pd.read_csv(csv_file_path)
         movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').astype('float32')
         movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').astype('float32')
         movies_df.fillna({'Genre': '', 'Popularity': 0, 'Vote_Count': 0, 'Vote_Average': 0}, inplace=True)
         movies_df['Popularity'] = movies_df['Popularity'].astype('float32')
 
+        # Setup TF-IDF for genres
         tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
         tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'])
 
-        feedback_titles = [movie['Title'] for movie in feedback_movies]
+        # Filter movies based on feedback
+        feedback_titles = [movie['Title'] for movie in feedback_movies if 'Title' in movie]
         movies_to_recommend = movies_df[~movies_df['Title'].isin(feedback_titles)].copy()
 
+        # Normalize and adjust scores based on feedback
         scaler = MinMaxScaler()
         movies_to_recommend['Normalized_Vote_Average'] = scaler.fit_transform(movies_to_recommend[['Vote_Average']])
         movies_to_recommend['Adjusted_Score'] = 0.0
 
         for feedback in feedback_movies:
-            feedback_genre_matrix = tfidf_vectorizer.transform([feedback['Genre']])
-            genre_similarity = cosine_similarity(feedback_genre_matrix, tfidf_matrix).flatten()
-            adjustment = 1 if feedback['State'] == 'like' else -1
-            movies_to_recommend['Adjusted_Score'] += genre_similarity * adjustment
+            if all(key in feedback for key in ['Genre', 'State']):  # Check for necessary keys
+                feedback_genre_matrix = tfidf_vectorizer.transform([feedback['Genre']])
+                genre_similarity = cosine_similarity(feedback_genre_matrix, tfidf_matrix).flatten()
+                adjustment = 1 if feedback['State'] == 'like' else -1
+                movies_to_recommend['Adjusted_Score'] += genre_similarity * adjustment
 
         movies_to_recommend['Adjusted_Score'] = scaler.fit_transform(movies_to_recommend[['Adjusted_Score']])
-        
-        # Add a random component to the final score calculation
         random_component = np.random.uniform(0.4, 0.6, len(movies_to_recommend))
-        movies_to_recommend['Final_Score'] = movies_to_recommend['Adjusted_Score'] * (1 - random_component)+ movies_to_recommend['Normalized_Vote_Average'] * random_component
+        movies_to_recommend['Final_Score'] = movies_to_recommend['Adjusted_Score'] * (1 - random_component) + movies_to_recommend['Normalized_Vote_Average'] * random_component
 
-        # Sort and select top N recommendations based on the final score
         recommendations = movies_to_recommend.sort_values(by='Final_Score', ascending=False).head(top_n)
-
         return recommendations.to_json(orient='records')
 
     except Exception as e:
@@ -169,7 +173,8 @@ def main():
         result = generate_recommendations(liked_movies, history_submit)
         print(result)   
     elif input_json.get('function') == 'generate_adjusted_recommendations':
-        feedback_movies = input_json.get('feedback', [])
+        feedback_movies = input_json.get('feedbackMovies', [])
+        feedback_movies = input_json.get('feedbackMovies', [])
         result = generate_adjusted_recommendations(feedback_movies)
         print(result)
     else :

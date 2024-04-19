@@ -29,7 +29,8 @@ const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendati
                 acc.push({
                     Title: movie.Title,
                     State: state,
-                    Genre: movie.Genre // Assuming each movie object has a Genre property
+                    Genre: movie.Genre,
+                    User_ID: movie.User_ID // Assuming each movie object has a Genre property
                 });
             }
             return acc;
@@ -41,7 +42,7 @@ const MovieRecommended = ({ open, onClose, recommendations, onUpdateRecommendati
         console.log("Feedback History:", feedbackHistory);
         console.log("Latest Feedback:", feedbackMovies);
 
-        recommendedMoviesFromFeedbackMovies(feedbackHistory + feedbackMovies);
+        recommendedMoviesFromFeedbackMovies(feedbackMovies);
     };
 
     const recommendedMoviesFromFeedbackMovies = (feedbackMovies) => {

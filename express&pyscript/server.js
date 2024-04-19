@@ -97,35 +97,6 @@ app.post('/recommendations-from-liked', (req, res) => {
     });
 });
 
-app.post('/recommendations-from-liked', (req, res) => {
-    const likedMovies = req.body;
-    // Spawn the Python process
-    const pythonProcess = spawn('python', ['process_movie_info.py']);
-    let dataString = '';
-
-    // Send the liked movies data to the Python script
-    pythonProcess.stdin.write(JSON.stringify({ function: 'generate_recommendations', likedMovies: likedMovies }));
-    pythonProcess.stdin.end();
-
-    // Collect data from script
-    pythonProcess.stdout.on('data', function(data) {
-        dataString += data.toString();
-    });
-
-    pythonProcess.on('close', function(code) {
-        if (code !== 0 || !dataString) {
-            return res.status(500).send({ error: "Failed to execute Python script or received empty output" });
-        }
-        try {
-            const parsedData = JSON.parse(dataString);
-            res.send(parsedData);
-        } catch (error) {
-            console.error("Failed to parse JSON from Python script:", error);
-            res.status(500).send({ error: "Failed to parse JSON output from Python script" });
-        }
-    });
-});
-
 app.post('/recommendations-from-feedback', (req, res) => {
     const feedbackMovies = req.body;
     // Spawn the Python process
