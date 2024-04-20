@@ -15,6 +15,7 @@ liked_movies = [
 # Assuming this path; update it to your actual CSV file location
 csv_file_path = 'express&pyscript/csv/mymoviedb.csv'
 ratings_csv_path= 'express&pyscript/csv/user_ratings.csv'
+feedback_csv_path = 'express&pyscript/csv/Hy_Recommendations.csv'
 
 def get_recommended_movies(genres):
     try:
@@ -132,6 +133,101 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
     except Exception as e:
         return json.dumps({"error": str(e)})
     
+def generate_adjusted_recommendations(feedback_movies, top_n=5):
+    try:
+        ratings_df = pd.read_csv(ratings_csv_path)
+        movies_df = pd.read_csv(csv_file_path)
 
-print(generate_recommendations(liked_movies, {}))
+        # Save feedback
+        feedback_df = pd.DataFrame(feedback_movies)
+        if os.path.exists(feedback_csv_path):
+            feedback_df.to_csv(feedback_csv_path, mode='a', index=False)
+        else:
+            feedback_df.to_csv(feedback_csv_path, header=True, index=False)
+                        
+        feedback_history = pd.read_csv(feedback_csv_path)
+        
+        # Convert and fill missing values
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').fillna(0).astype('float32')
+        movies_df.fillna({'Genre': '', 'Popularity': 0}, inplace=True)
+
+        # Normalize features
+        scaler = MinMaxScaler()
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
+            movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
+        )
+
+        # Handle TF-IDF vectorization for genres
+        tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'].fillna(''))
+        genre_similarities = cosine_similarity(tfidf_matrix)
+
+        # Create a dictionary from ratings_df for easy score updates
+        movie_scores = ratings_df.set_index('Title')['Score'].to_dict()
+
+        # Process feedback and adjust scores based on feedback
+        for index, row in feedback_history.iterrows():
+            if row['Title'] in movie_scores:
+                idx = movies_df[movies_df['Title'] == row['Title']].index[0]
+                similarity_scores = genre_similarities[idx]
+                adjustment_factor = 1 if row['State'] == 'liked' else -1 if row['State'] == 'disliked' else 0
+                movie_scores[row['Title']] += (similarity_scores * adjustment_factor).sum()
+
+        # Update movies_df with adjusted scores
+        movies_df['Adjusted_Score'] = movies_df['Title'].map(movie_scores)
+        movies_df['Adjusted_Score'] = np.clip(movies_df['Adjusted_Score'], 1, 10)  # Ensure scores are within range
+
+        # Normalize adjusted scores
+        movies_df['Normalized_Score'] = scaler.fit_transform(movies_df[['Adjusted_Score']].fillna(0))
+
+        # Calculate final scores
+        weights = {'cf': 0.6, 'cbf': 0.4}
+        movies_df['Final_Score'] = movies_df['Normalized_Score'] * weights['cf'] + genre_similarities.diagonal() * weights['cbf']
+
+        # Select top N recommendations
+        recommendations = movies_df[~movies_df['Title'].isin(feedback_history['Title'])]
+        recommendations = recommendations.nlargest(top_n, 'Final_Score')
+        recommendations['Reason'] = "Combines content-based and collaborative filtering scores."
+
+        # Prepare the result
+        return recommendations.to_json(orient='records')
+
+    except Exception as e:
+        return json.dumps({"error": str(e), "message": "Failed to generate recommendations"})
+
+feedback_movies  = [
+        {
+            "Title": "Robin Hood",
+            "State": "disliked",
+            "Genre": "Adventure, Action, Thriller",
+            "User_ID": 5036
+        },
+        {
+            "Title": "King Kong",
+            "State": "disliked",
+            "Genre": "Adventure, Drama, Action",
+            "User_ID": 5036
+        },
+        {
+            "Title": "The Avengers",
+            "State": "disliked",
+            "Genre": "Science Fiction, Action, Adventure",
+            "User_ID": 5036
+        },
+        {
+            "Title": "Batman",
+            "State": "disliked",
+            "Genre": "Action, Adventure, Crime, Science Fiction, Thriller, War",
+            "User_ID": 5036
+        },
+        {
+            "Title": "The Courier",
+            "State": "disliked",
+            "Genre": "Crime, Action, Drama, Thriller",
+            "User_ID": 5036
+        }
+    ]
+
+print(generate_adjusted_recommendations(feedback_movies))
 

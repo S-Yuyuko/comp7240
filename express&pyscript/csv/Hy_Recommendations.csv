@@ -1,0 +1,22 @@
+Title,State,Genre,User_ID
+Robin Hood,disliked,"Adventure, Action, Thriller",5036
+King Kong,disliked,"Adventure, Drama, Action",5036
+The Avengers,disliked,"Science Fiction, Action, Adventure",5036
+Batman,disliked,"Action, Adventure, Crime, Science Fiction, Thriller, War",5036
+The Courier,disliked,"Crime, Action, Drama, Thriller",5036
+Title,State,Genre,User_ID
+Robin Hood,disliked,"Adventure, Action, Thriller",5036
+King Kong,disliked,"Adventure, Drama, Action",5036
+The Avengers,disliked,"Science Fiction, Action, Adventure",5036
+Batman,disliked,"Action, Adventure, Crime, Science Fiction, Thriller, War",5036
+The Courier,disliked,"Crime, Action, Drama, Thriller",5036
+Batman & Bill,disliked,Documentary,5043
+11M,disliked,Documentary,5043
+Downfall: The Case Against Boeing,liked,Documentary,5043
+Disclosure,liked,Documentary,5043
+Minecraft: The Story of Mojang,disliked,Documentary,5043
+Batman & Bill,disliked,Documentary,5044
+11M,disliked,Documentary,5044
+Downfall: The Case Against Boeing,liked,Documentary,5044
+Disclosure,liked,Documentary,5044
+Minecraft: The Story of Mojang,disliked,Documentary,5044
