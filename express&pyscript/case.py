@@ -7,11 +7,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 
-liked_movies = [
-    {'Title': 'Inception', 'Score': 9.0, 'Genre': 'Action, Adventure, Science Fiction'},
-    {'Title': 'The Matrix', 'Score': 8.7, 'Genre': 'Action, Science Fiction'},
-    {'Title': 'Interstellar', 'Score': 9.1, 'Genre': 'Adventure, Drama, Science Fiction'}
-]
 # Assuming this path; update it to your actual CSV file location
 csv_file_path = 'express&pyscript/csv/mymoviedb.csv'
 ratings_csv_path= 'express&pyscript/csv/user_ratings.csv'
@@ -37,7 +32,6 @@ def get_recommended_movies(genres):
     except Exception as e:
         return json.dumps({"error": str(e)})
     
-
 def generate_recommendations(liked_movies, historySubmit, top_n=5):
     try:
         # Load and preprocess the movie dataset
@@ -133,6 +127,160 @@ def generate_recommendations(liked_movies, historySubmit, top_n=5):
     except Exception as e:
         return json.dumps({"error": str(e)})
     
+    
+def generate_cf_recommendations(liked_movies, historySubmit, top_n=5):
+    try:
+        # Load and preprocess the movie dataset
+        movies_df = pd.read_csv(csv_file_path)
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').fillna(0).astype('float32')
+        movies_df.fillna({'Genre': '', 'Popularity': 0}, inplace=True)
+
+        # Normalize features using MinMaxScaler
+        scaler = MinMaxScaler()
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
+            movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
+        )
+       # Load or initialize the ratings DataFrame
+        if os.path.exists(ratings_csv_path):
+            ratings_df = pd.read_csv(ratings_csv_path)
+        else:
+            ratings_df = pd.DataFrame(columns=['User_ID', 'Title', 'Score', 'Genre'])
+
+        # Update ratings DataFrame with new history data
+        new_data = []
+        new_user_id = ratings_df['User_ID'].iloc[-1] + 1 if not ratings_df.empty else 1
+        for _, movies in historySubmit.items():
+            for movie in movies:
+                new_data.append({
+                    'User_ID': new_user_id,
+                    'Title': movie['Title'],
+                    'Score': movie['Score'],
+                    'Genre': movie['Genre']
+                })
+
+        # Append new ratings to existing data, drop duplicates, and save
+        new_ratings_df = pd.DataFrame(new_data)
+        ratings_df = pd.concat([ratings_df, new_ratings_df], ignore_index=True)
+        ratings_df.drop_duplicates(subset=['User_ID', 'Title'], keep='last', inplace=True)
+        ratings_df.to_csv(ratings_csv_path, index=False)
+
+        # Create user-item matrix
+        user_item_matrix = ratings_df.pivot_table(index='User_ID', columns='Title', values='Score', fill_value=0)
+        movie_titles = movies_df['Title'].tolist()
+        user_item_matrix = user_item_matrix.reindex(columns=movie_titles, fill_value=0)
+
+        # Compute item-item cosine similarity
+        item_similarity = cosine_similarity(user_item_matrix.T)
+
+        # Calculate initial CF scores as the mean similarity
+        cf_scores = item_similarity.mean(axis=0)
+
+        # Enhance CF scores with liked movie information
+        for liked_movie in liked_movies:
+            if liked_movie['Title'] in movie_titles:
+                idx = movie_titles.index(liked_movie['Title'])
+                # Weight the CF scores by the user's rating of the liked movies
+                cf_scores += item_similarity[idx] * (liked_movie['Score'] / 10)
+
+        # Normalize the scores
+        max_cf_score = max(cf_scores)
+        if max_cf_score > 0:
+            cf_scores /= max_cf_score
+
+        # Get the top N recommendations
+        movie_indices = np.argsort(cf_scores)[-top_n:][::-1]
+        recommended_movies = movies_df.iloc[movie_indices]
+
+        recommendations = [{
+            'User_ID': new_user_id,
+            'Title': movie.Title,
+            'CF Score': cf_scores[idx],
+            'Reason': f"Enhanced CF Score: {cf_scores[idx]:.2f}"
+        } for idx, movie in zip(movie_indices, recommended_movies.itertuples(index=False))]
+
+        return recommendations
+
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+    
+def generate_cbf_recommendations(liked_movies, historySubmit, top_n=5):
+    try:
+        # Load and preprocess the movie dataset
+        movies_df = pd.read_csv(csv_file_path)
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').fillna(0).astype('float32')
+        movies_df.fillna({'Genre': '', 'Popularity': 0}, inplace=True)
+
+        # Normalize features using MinMaxScaler
+        scaler = MinMaxScaler()
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
+            movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
+        )
+
+        # Load or initialize the ratings DataFrame
+        if os.path.exists(ratings_csv_path):
+            ratings_df = pd.read_csv(ratings_csv_path)
+        else:
+            ratings_df = pd.DataFrame(columns=['User_ID', 'Title', 'Score', 'Genre'])
+
+        # Update ratings DataFrame with new history data
+        new_data = []
+        new_user_id = ratings_df['User_ID'].iloc[-1] + 1 if not ratings_df.empty else 1
+        for _, movies in historySubmit.items():
+            for movie in movies:
+                new_data.append({
+                    'User_ID': new_user_id,
+                    'Title': movie['Title'],
+                    'Score': movie['Score'],
+                    'Genre': movie['Genre']
+                })
+
+        # Append new ratings to existing data, drop duplicates, and save
+        new_ratings_df = pd.DataFrame(new_data)
+        ratings_df = pd.concat([ratings_df, new_ratings_df], ignore_index=True)
+        ratings_df.drop_duplicates(subset=['User_ID', 'Title'], keep='last', inplace=True)
+        ratings_df.to_csv(ratings_csv_path, index=False)
+
+        # Create user-item matrix
+        user_item_matrix = ratings_df.pivot_table(index='User_ID', columns='Title', values='Score', fill_value=0)
+        movie_titles = movies_df['Title'].tolist()
+        user_item_matrix = user_item_matrix.reindex(columns=movie_titles, fill_value=0)
+
+        # Compute item-item cosine similarity
+        item_similarity = cosine_similarity(user_item_matrix.T)
+
+        # Calculate initial CF scores as the mean similarity
+        cf_scores = item_similarity.mean(axis=0)
+
+        # Enhance CF scores with liked movie information
+        for liked_movie in liked_movies:
+            if liked_movie['Title'] in movie_titles:
+                idx = movie_titles.index(liked_movie['Title'])
+                # Weight the CF scores by the user's rating of the liked movies
+                cf_scores += item_similarity[idx] * (liked_movie['Score'] / 10)
+
+        # Normalize the scores
+        max_cf_score = max(cf_scores)
+        if max_cf_score > 0:
+            cf_scores /= max_cf_score
+
+        # Get the top N recommendations
+        movie_indices = np.argsort(cf_scores)[-top_n:][::-1]
+        recommended_movies = movies_df.iloc[movie_indices]
+
+        recommendations = [{
+            'User_ID': new_user_id,
+            'Title': movie.Title,
+            'CF Score': cf_scores[idx],
+            'Reason': f"Enhanced CF Score: {cf_scores[idx]:.2f}"
+        } for idx, movie in zip(movie_indices, recommended_movies.itertuples(index=False))]
+
+        return recommendations
+
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+
 def generate_adjusted_recommendations(feedback_movies, top_n=5):
     try:
         ratings_df = pd.read_csv(ratings_csv_path)
@@ -140,6 +288,7 @@ def generate_adjusted_recommendations(feedback_movies, top_n=5):
 
         # Save feedback
         feedback_df = pd.DataFrame(feedback_movies)
+        user_id = feedback_df.iloc[0]['User_ID']
         if os.path.exists(feedback_csv_path):
             feedback_df.to_csv(feedback_csv_path, mode='a', index=False)
         else:
@@ -189,45 +338,183 @@ def generate_adjusted_recommendations(feedback_movies, top_n=5):
         recommendations = movies_df[~movies_df['Title'].isin(feedback_history['Title'])]
         recommendations = recommendations.nlargest(top_n, 'Final_Score')
         recommendations['Reason'] = "Combines content-based and collaborative filtering scores."
-
+        recommendations['User_ID'] = user_id
         # Prepare the result
         return recommendations.to_json(orient='records')
 
     except Exception as e:
         return json.dumps({"error": str(e), "message": "Failed to generate recommendations"})
 
+def generate_cf_adjusted_recommendations(feedback_movies, top_n=5):
+    try:
+        ratings_df = pd.read_csv(ratings_csv_path)
+        movies_df = pd.read_csv(csv_file_path)
+
+        # Save feedback
+        feedback_df = pd.DataFrame(feedback_movies)
+        user_id = feedback_df.iloc[0]['User_ID']
+
+        if os.path.exists(feedback_csv_path):
+            feedback_df.to_csv(feedback_csv_path, mode='a', header=False, index=False)
+        else:
+            feedback_df.to_csv(feedback_csv_path, header=True, index=False)
+                        
+        feedback_history = pd.read_csv(feedback_csv_path)
+        
+        # Convert and fill missing values
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').fillna(0).astype('float32')
+        movies_df.fillna({'Genre': '', 'Popularity': 0}, inplace=True)
+
+        # Normalize features
+        scaler = MinMaxScaler()
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
+            movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
+        )
+
+        user_item_matrix = ratings_df.pivot_table(index='User_ID', columns='Title', values='Score', fill_value=0)
+        item_similarity = cosine_similarity(user_item_matrix.T)
+        cf_scores = item_similarity.mean(axis=0)
+
+        # Map scores to movie titles
+        score_map = dict(zip(user_item_matrix.columns, cf_scores))
+
+        # Adjust scores based on feedback
+        for index, row in feedback_history.iterrows():
+            movie_title = row['Title']
+            if movie_title in score_map:
+                adjustment_factor = 1 if row['State'] == 'liked' else -1 if row['State'] == 'disliked' else 0
+                score_map[movie_title] += adjustment_factor
+
+        # Apply scores to the movies dataframe
+        movies_df['CF_Score'] = movies_df['Title'].map(score_map).fillna(0)
+
+        # Get recommendations
+        recommendations_df = movies_df[~movies_df['Title'].isin(feedback_history['Title'])]
+        recommendations_df = movies_df.nlargest(top_n, 'CF_Score')
+
+        recommendations = [{
+            'User_ID': user_id,
+            'Title': movie.Title,
+            'Release_Date': movie.Release_Date,
+            'Overview': movie.Overview,
+            'Popularity': float(movie.Popularity),
+            'Vote_Count': int(movie.Vote_Count),
+            'Vote_Average': float(movie.Vote_Average),
+            'Original_Language': movie.Original_Language,
+            'Genre': movie.Genre,
+            'Poster_Url': movie.Poster_Url,
+            'Reason': "Recommended based on collaborative user preferences."
+        } for movie in recommendations_df.itertuples(index=False)]
+
+        return json.dumps(recommendations)
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Failed to generate recommendations"}
+    
+def generate_cbf_adjusted_recommendations(feedback_movies, top_n=5): 
+    try:
+        ratings_df = pd.read_csv(ratings_csv_path)
+        movies_df = pd.read_csv(csv_file_path)
+
+        # Save feedback
+        feedback_df = pd.DataFrame(feedback_movies)
+        user_id = feedback_df.iloc[0]['User_ID']
+
+        if os.path.exists(feedback_csv_path):
+            feedback_df.to_csv(feedback_csv_path, mode='a', header=False, index=False)
+        else:
+            feedback_df.to_csv(feedback_csv_path, header=True, index=False)
+                        
+        feedback_history = pd.read_csv(feedback_csv_path)
+        
+        # Convert and fill missing values
+        movies_df['Vote_Count'] = pd.to_numeric(movies_df['Vote_Count'], errors='coerce').fillna(0).astype('float32')
+        movies_df['Vote_Average'] = pd.to_numeric(movies_df['Vote_Average'], errors='coerce').fillna(0).astype('float32')
+        movies_df.fillna({'Genre': '', 'Popularity': 0}, inplace=True)
+
+        # Normalize features
+        scaler = MinMaxScaler()
+        movies_df[['Nor_Popularity', 'Nor_Vote_Count', 'Nor_Vote_Average']] = scaler.fit_transform(
+            movies_df[['Popularity', 'Vote_Count', 'Vote_Average']]
+        )
+
+        tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
+        tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'].fillna(''))
+        genre_similarities = cosine_similarity(tfidf_matrix)
+
+        movie_scores = {title: 0 for title in movies_df['Title']}
+        for index, row in feedback_history.iterrows():
+            if row['Title'] in movie_scores:
+                idx = movies_df[movies_df['Title'] == row['Title']].index[0]
+                similarity_scores = genre_similarities[idx]
+                adjustment_factor = 1 if row['State'] == 'liked' else -1 if row['State'] == 'disliked' else 0
+                movie_scores[row['Title']] += (similarity_scores * adjustment_factor).sum()
+
+        movies_df['Adjusted_Score'] = movies_df['Title'].map(movie_scores)
+
+        recommendations_df = movies_df[~movies_df['Title'].isin(feedback_history['Title'])]
+        recommendations_df = movies_df.nlargest(top_n, 'Adjusted_Score')
+
+        recommendations = [{
+            'User_ID': user_id,
+            'Title': movie.Title,
+            'Release_Date': movie.Release_Date,
+            'Overview': movie.Overview,
+            'Popularity': float(movie.Popularity),
+            'Vote_Count': int(movie.Vote_Count),
+            'Vote_Average': float(movie.Vote_Average),
+            'Original_Language': movie.Original_Language,
+            'Genre': movie.Genre,
+            'Poster_Url': movie.Poster_Url,
+            'Reason': "Recommended based on genre preferences."
+        } for movie in recommendations_df.itertuples(index=False)]
+
+        return json.dumps(recommendations)
+    
+    except Exception as e:
+        return {"error": str(e), "message": "Failed to generate recommendations"}
+
+liked_movies = [
+    {'Title': 'Inception', 'Score': 9.0, 'Genre': 'Action, Adventure, Science Fiction'},
+    {'Title': 'The Matrix', 'Score': 8.7, 'Genre': 'Action, Science Fiction'},
+    {'Title': 'Interstellar', 'Score': 9.1, 'Genre': 'Adventure, Drama, Science Fiction'}
+]
+
+historySubmit = {}
+
 feedback_movies  = [
         {
             "Title": "Robin Hood",
             "State": "disliked",
             "Genre": "Adventure, Action, Thriller",
-            "User_ID": 5036
+            "User_ID": 5050
         },
         {
             "Title": "King Kong",
             "State": "disliked",
             "Genre": "Adventure, Drama, Action",
-            "User_ID": 5036
+            "User_ID": 5050
         },
         {
             "Title": "The Avengers",
             "State": "disliked",
             "Genre": "Science Fiction, Action, Adventure",
-            "User_ID": 5036
+            "User_ID": 5050
         },
         {
             "Title": "Batman",
             "State": "disliked",
             "Genre": "Action, Adventure, Crime, Science Fiction, Thriller, War",
-            "User_ID": 5036
+            "User_ID": 5050
         },
         {
             "Title": "The Courier",
             "State": "disliked",
             "Genre": "Crime, Action, Drama, Thriller",
-            "User_ID": 5036
+            "User_ID": 5050
         }
     ]
 
-print(generate_adjusted_recommendations(feedback_movies))
+print(generate_cbf_adjusted_recommendations(feedback_movies))
 
