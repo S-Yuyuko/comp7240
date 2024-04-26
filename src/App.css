@@ -137,3 +137,196 @@ body {
   font-size: 16px;
   z-index: 1000;  /* Ensure it's above other elements */
 }
+
+.eva-dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.eva-dialog {
+  background: #eceaea; /* Slightly off-white background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 600px;
+  z-index: 1001;
+}
+
+.eva-dialog h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+.eva-dialog h3 {
+  color: #555; /* Slightly darker color for headings */
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.eva-dialog p {
+  color: #666;
+  margin-top: 5px;
+  font-size: 16px;
+}
+
+.eva-dialog button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.eva-dialog button:hover {
+  background-color: #0056b3;
+}
+
+.eva-dialog button:active {
+  background-color: #004085;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.analytics-table th,
+.analytics-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.analytics-table th {
+  background-color: #f8f8f8; /* Light gray for table headers */
+  color: #333;
+}
+
+.analytics-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.analytics-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.analytics-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+}
+
+.questionnaire-button {
+  position: fixed;
+  bottom: 60px;
+  left: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;  /* Example blue background */
+  color: white;
+  border: none;
+  border-radius: 10px;  /* Rounded corners */
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 1000;  /* Ensure it's above other elements */
+}
+
+.questionnaire-dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.questionnaire-dialog {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.star-rating .star {
+  display: inline-block;
+  color: gold;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.star-rating .star.selected {
+  color: darkorange;
+}
+
+.textarea-feedback {
+  width: 90%; /* Full width to fit container */
+  min-height: 150px; /* Minimum height */
+  padding: 10px; /* Comfortable padding */
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #fff; /* White background */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Inner shadow for depth */
+  font-size: 16px; /* Legible text size */
+  font-family: 'Arial', sans-serif; /* Pleasant, readable font */
+  transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+}
+
+.textarea-feedback::placeholder {
+  color: #aaa; /* Lighter text for placeholder */
+}
+
+.textarea-feedback:focus {
+  border-color: #0056b3; /* Highlight color on focus */
+  box-shadow: 0 0 0 2px rgba(0,86,179,0.2); /* Subtle outer glow on focus */
+  outline: none; /* Remove default focus outline */
+}
+
+.feedback-history {
+  margin-top: 20px;
+  overflow-y: auto; /* Allows vertical scrolling */
+  border: 1px solid #ccc; /* Adds a border to the scrollable area */
+  max-height: 200px; /* Maximum height before scrolling */
+}
+
+/* Style the table */
+.feedback-history table {
+  width: 100%; /* Full width */
+  border-collapse: collapse; /* Collapse borders */
+}
+
+.feedback-history th,
+.feedback-history td {
+  border: 1px solid #ddd; /* Border for each cell */
+  padding: 8px; /* Spacing within cells */
+  text-align: left; /* Align text to the left */
+}
+
+.feedback-history th {
+  background-color: #f2f2f2; /* Background color for headers */
+  font-weight: bold; /* Make header fonts bold */
+}
+
+/* Zebra striping for rows */
+.feedback-history tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.feedback-history tr:hover {
+  background-color: #f1f1f1; /* Hover effect for rows */
+}

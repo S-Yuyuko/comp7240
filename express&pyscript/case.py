@@ -242,40 +242,41 @@ def generate_cbf_recommendations(liked_movies, historySubmit, top_n=5):
         ratings_df.drop_duplicates(subset=['User_ID', 'Title'], keep='last', inplace=True)
         ratings_df.to_csv(ratings_csv_path, index=False)
 
-        # Create user-item matrix
-        user_item_matrix = ratings_df.pivot_table(index='User_ID', columns='Title', values='Score', fill_value=0)
-        movie_titles = movies_df['Title'].tolist()
-        user_item_matrix = user_item_matrix.reindex(columns=movie_titles, fill_value=0)
+        # Initialize the TF-IDF vectorizer for genres
+        tfidf_vectorizer = TfidfVectorizer(tokenizer=lambda x: x.split(', '), stop_words='english')
+        genre_tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df['Genre'])
 
-        # Compute item-item cosine similarity
-        item_similarity = cosine_similarity(user_item_matrix.T)
+        # Aggregate the scores for each movie based on the liked movies' genres and scores
+        score_weighted_genre_similarities = np.zeros(genre_tfidf_matrix.shape[0])
 
-        # Calculate initial CF scores as the mean similarity
-        cf_scores = item_similarity.mean(axis=0)
-
-        # Enhance CF scores with liked movie information
         for liked_movie in liked_movies:
-            if liked_movie['Title'] in movie_titles:
-                idx = movie_titles.index(liked_movie['Title'])
-                # Weight the CF scores by the user's rating of the liked movies
-                cf_scores += item_similarity[idx] * (liked_movie['Score'] / 10)
+            # Get the genre vector for the liked movie
+            liked_movie_index = movies_df[movies_df['Title'] == liked_movie['Title']].index
+            if not liked_movie_index.empty:
+                liked_genre_vector = genre_tfidf_matrix[liked_movie_index[0]]
+                
+                # Calculate genre similarities
+                genre_similarities = cosine_similarity(genre_tfidf_matrix, liked_genre_vector).flatten()
+                
+                # Apply the movie's score as a weight to the similarities
+                score_weighted_genre_similarities += genre_similarities * liked_movie['Score']
 
-        # Normalize the scores
-        max_cf_score = max(cf_scores)
-        if max_cf_score > 0:
-            cf_scores /= max_cf_score
+        # Normalize the combined scores to prevent scale issues
+        max_score = np.max(score_weighted_genre_similarities)
+        if max_score > 0:
+            score_weighted_genre_similarities /= max_score
 
         # Get the top N recommendations
-        movie_indices = np.argsort(cf_scores)[-top_n:][::-1]
+        movie_indices = np.argsort(score_weighted_genre_similarities)[-top_n:][::-1]
         recommended_movies = movies_df.iloc[movie_indices]
-
+        
         recommendations = [{
             'User_ID': new_user_id,
-            'Title': movie.Title,
-            'CF Score': cf_scores[idx],
-            'Reason': f"Enhanced CF Score: {cf_scores[idx]:.2f}"
+            'Score': score_weighted_genre_similarities[idx],
+            'Genre': movie.Genre,
+            'Reason': f"Genre-based Score: {score_weighted_genre_similarities[idx]:.2f}"
         } for idx, movie in zip(movie_indices, recommended_movies.itertuples(index=False))]
-
+        
         return recommendations
 
     except Exception as e:
@@ -340,6 +341,7 @@ def generate_adjusted_recommendations(feedback_movies, top_n=5):
         recommendations['Reason'] = "Combines content-based and collaborative filtering scores."
         recommendations['User_ID'] = user_id
         # Prepare the result
+
         return recommendations.to_json(orient='records')
 
     except Exception as e:
@@ -516,5 +518,5 @@ feedback_movies  = [
         }
     ]
 
-print(generate_cbf_adjusted_recommendations(feedback_movies))
+print(generate_cbf_recommendations(liked_movies, {}))
 

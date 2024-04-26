@@ -1,0 +1,41 @@
+Title,State,Genre,User_ID
+Carrie,disliked,"Horror, Thriller",5069
+Carrie,disliked,"Drama, Horror, TV Movie",5069
+Carrie,disliked,"Drama, Horror",5069
+Alice in Wonderland,liked,"Fantasy, Family",5069
+Alice in Wonderland,liked,"Family, Fantasy, Adventure",5069
+Halloween,disliked,"Horror, Thriller",5069
+Halloween,disliked,"Horror, Thriller",5069
+Halloween,disliked,Horror,5069
+Dumbo,liked,"Animation, Family",5069
+Dumbo,liked,"Family, Fantasy, Adventure",5069
+Circle,liked,"Science Fiction, Mystery, Drama, Thriller, Horror",5069
+The Woman in the Window,liked,"Drama, Crime, Mystery, Thriller",5069
+Ride or Die,disliked,"Drama, Romance, Thriller",5069
+Ride or Die,disliked,"Crime, Drama, Romance",5069
+The Mexican,liked,"Action, Comedy, Crime, Romance",5069
+Horrible Bosses 2,liked,Comedy,5069
+The Call,liked,"Crime, Thriller",5069
+The Call,liked,"Thriller, Mystery, Science Fiction",5069
+The Call,liked,"Horror, Thriller",5069
+Vanity Fair,disliked,"Drama, Romance",5069
+Carrie,disliked,"Drama, Horror, TV Movie",5121
+Carrie,disliked,"Drama, Horror",5121
+Carrie,disliked,"Horror, Thriller",5121
+Alice in Wonderland,liked,"Adventure, Family, Fantasy",5121
+Alice in Wonderland,liked,"Animation, Family, Fantasy, Adventure",5121
+The Last House on the Left,disliked,"Crime, Thriller, Horror, Drama",5121
+The Last House on the Left,disliked,"Horror, Thriller",5121
+Star Trek Into Darkness,liked,"Action, Adventure, Science Fiction",5121
+The Day the Earth Stood Still,liked,"Drama, Science Fiction, Thriller",5121
+The Day the Earth Stood Still,liked,"Drama, Science Fiction",5121
+Carrie,liked,"Drama, Horror",5124
+Carrie,liked,"Horror, Thriller",5124
+Carrie,liked,"Drama, Horror, TV Movie",5124
+Alice in Wonderland,disliked,"Adventure, Family, Fantasy",5124
+Alice in Wonderland,disliked,"Fantasy, Family",5124
+Carrie,disliked,"Drama, Horror, TV Movie",5127
+Carrie,disliked,"Horror, Thriller",5127
+Carrie,disliked,"Drama, Horror",5127
+Alice in Wonderland,liked,"Adventure, Family, Fantasy",5127
+Alice in Wonderland,liked,"Animation, Family, Fantasy, Adventure",5127

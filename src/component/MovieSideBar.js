@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './css/MovieSideBar.css'; // Ensure the CSS file is correctly linked
 
-const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, toggleDialog }) => {
+const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendations, onFetchRecommendations_A, onFetchRecommendations_B, toggleDialog }) => {
   const [historySubmit, setHistorySubmit] = useState([]);
   const [submitCount, setSubmitCount] = useState(0);
 
@@ -20,8 +20,13 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
             <span key={index}
                   className="star"
                   onClick={() => handleStarClick(ratingValue)}
-                  style={{ cursor: 'pointer', color: ratingValue <= (movie.Score || 0) ? '#ffc107' : '#e4e5e9', fontSize: '24px' }}>
-              ⭐️
+                  style={{
+                    cursor: 'pointer', 
+                    color: ratingValue <= (movie.Score || 0) ? '#ffc107' : '#e4e5e9', 
+                    fontSize: '24px'
+                  }}
+                  aria-label={`Rate ${ratingValue} out of 10`}>
+              {ratingValue <= (movie.Score || 0) ? '★' : '☆'}
             </span>
           );
         })}
@@ -44,33 +49,105 @@ const MovieSideBar = ({ likedMovies, onRemove, onScoreChange, onFetchRecommendat
   };
 
   useEffect(() => {
-    if (likedMovies.length > 0) {
-      recommendedMoviesFromLikedMovies(likedMovies);
-      console.log(historySubmit)
-    }
+    const fetchRecommendationsSequentially = async () => {
+      if (likedMovies.length > 0) {
+        try {
+          await recommendedMoviesFromLikedMovies(likedMovies);
+          await recommendedMoviesFromLikedMovies_A(likedMovies);
+          await recommendedMoviesFromLikedMovies_B(likedMovies);
+          toggleDialog(true);
+        } catch (error) {
+          console.error('Error during fetch sequence:', error);
+        }
+      }
+    };
+
+    fetchRecommendationsSequentially();
   }, [submitCount]);
 
-  const recommendedMoviesFromLikedMovies = (likedMovies) => {
-    fetch('http://localhost:4000/recommendations-from-liked', {
+  const fetchJson = async (url, body) => {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ likedMovies: likedMovies,  historySubmit: historySubmit}),
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Assuming 'data' is the list of recommended movies
-      console.log(data);
-      onFetchRecommendations(data);
-      toggleDialog(true);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      toggleDialog(false); // Ensure dialog is closed on error
+      body: JSON.stringify(body),
     });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
   };
   
+  const recommendedMoviesFromLikedMovies = async (likedMovies) => {
+    const data = await fetchJson('http://localhost:4000/recommendations-from-liked', { likedMovies, historySubmit });
+    onFetchRecommendations(data); // Trigger action with fetched data
+    return data; // Return data if needed elsewhere
+  };
+  
+  const recommendedMoviesFromLikedMovies_A = async (likedMovies) => {
+    const data = await fetchJson('http://localhost:4000/recommendations-from-liked_A', { likedMovies, historySubmit });
+    onFetchRecommendations_A(data); // Trigger action with fetched data
+    return data; // Return data if needed elsewhere
+  };
+  
+  const recommendedMoviesFromLikedMovies_B = async (likedMovies) => {
+    const data = await fetchJson('http://localhost:4000/recommendations-from-liked_B', { likedMovies, historySubmit });
+    onFetchRecommendations_B(data); // Trigger action with fetched data
+    return data; // Return data if needed elsewhere
+  };
+  // const recommendedMoviesFromLikedMovies = (likedMovies) => {
+  //   fetch('http://localhost:4000/recommendations-from-liked', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ likedMovies: likedMovies,  historySubmit: historySubmit}),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     // Assuming 'data' is the list of recommended movies
+  //     console.log(data);
+  //     onFetchRecommendations(data);
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:', error);
+  //   });
+  // };
+  // const recommendedMoviesFromLikedMovies_A = (likedMovies) => {
+  //   fetch('http://localhost:4000/recommendations-from-liked_A', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ likedMovies: likedMovies,  historySubmit: historySubmit}),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     console.log(data);
+  //     onFetchRecommendations_A(data);
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:_A', error);
+  //   });
+  // };
+  // const recommendedMoviesFromLikedMovies_B = (likedMovies) => {
+  //   fetch('http://localhost:4000/recommendations-from-liked_B', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({ likedMovies: likedMovies,  historySubmit: historySubmit}),
+  //   })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     console.log(data);
+  //     onFetchRecommendations_B(data);
+  //   })
+  //   .catch(error => {
+  //     console.error('Error:_B', error);
+  //   });
+  // };  
   return (
     <>
       <aside className="sidebar">
