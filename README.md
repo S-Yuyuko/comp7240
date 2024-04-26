@@ -1,3 +1,25 @@
+# The recommend system of group porject
+
+# Check the environment if which has node and npm or not
+
+in the terminal to input these commands
+
+### 'node -v'
+### 'npm -v'
+
+If these are not in environment, please tgo to the Node.js official website to download the Node.js
+
+# Install the dependencies of project
+In the terminal of the path of project(make sure the package.json in the current path)
+
+### 'npm install'
+
+This command can install the dependencies of package.json.
+
+After that, go to the file express$pytscript
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
