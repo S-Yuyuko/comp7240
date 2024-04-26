@@ -7,7 +7,7 @@ in the terminal to input these commands
 ### 'node -v'
 ### 'npm -v'
 
-If these are not in environment, please tgo to the Node.js official website to download the Node.js
+If these are not in environment, please go to the Node.js official website to download the Node.js
 
 # Install the dependencies of project
 In the terminal of the path of project(make sure the package.json in the current path)
