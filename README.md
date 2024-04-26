@@ -31,12 +31,12 @@ If these are not in environment, run the commands to install them.
 # Start the project
 
 Firstly, need to run the node project(back-end), use the command in the fold path './ExpressAndPyscript',and command is :
-# 'node server.js'
+### 'node server.js'
 
 When the terminal has 'Server listening at http://localhost:4000', which means back-end is successful to run.
 
 Secondly, go to the fold path of project './comp7240',use command:
-# 'npm start'
+### 'npm start'
 
 If running is successful, terminal has 'localhost:3000' or other ip address.
 
